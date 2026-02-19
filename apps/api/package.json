@@ -1,0 +1,30 @@
+{
+  "name": "@tech-challenge/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./router": "./src/router/index.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@tech-challenge/shared": "workspace:*",
+    "@trpc/server": "^11.0.0",
+    "@fastify/cors": "^11.0.0",
+    "fastify": "^5.2.1",
+    "lru-cache": "^11.0.2",
+    "superjson": "^2.2.2",
+    "undici": "^7.3.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
