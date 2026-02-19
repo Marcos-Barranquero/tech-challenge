@@ -45,7 +45,7 @@ h4 {
 .gba-console {
   position: relative;
   margin: 0 auto;
-  max-width: 1320px;
+  max-width: 1420px;
   border-radius: 68px;
   border: 3px solid #d8b4fe;
   background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 58%, #6d28d9 100%);
@@ -53,7 +53,7 @@ h4 {
     0 24px 60px rgba(76, 29, 149, 0.38),
     inset 0 3px 0 rgba(255, 255, 255, 0.46),
     inset 0 -8px 24px rgba(30, 27, 75, 0.3);
-  padding: 28px 34px 30px;
+  padding: 28px 34px 24px;
 }
 
 .gba-console::before,
@@ -105,9 +105,9 @@ h4 {
 }
 
 .screen-reel {
-  --tile-size: clamp(132px, 11vw, 172px);
-  --grid-gap: 10px;
-  --screen-pad: 16px;
+  --tile-size: clamp(154px, 12vw, 196px);
+  --grid-gap: 12px;
+  --screen-pad: 18px;
   height: calc((var(--tile-size) * 2) + var(--grid-gap) + (var(--screen-pad) * 2));
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -115,6 +115,12 @@ h4 {
   scroll-padding-top: var(--screen-pad);
   scroll-padding-bottom: var(--screen-pad);
   padding: var(--screen-pad) 14px;
+}
+
+.screen-reel-detail {
+  height: calc((var(--tile-size) * 2) + var(--grid-gap) + (var(--screen-pad) * 2));
+  overflow: hidden;
+  scroll-snap-type: none;
 }
 
 .screen-grid {
@@ -132,11 +138,22 @@ h4 {
 }
 
 .gba-controls {
-  margin-top: 18px;
+  margin-top: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 10px 2px;
+}
+
+.gba-brand-wrap {
+  margin-top: 6px;
+  text-align: center;
+}
+
+.gba-brand {
+  display: inline-block;
+  font-size: clamp(1.8rem, 3.2vw, 3.2rem);
+  line-height: 1;
 }
 
 .gba-dpad {
@@ -202,7 +219,7 @@ h4 {
 
 @media (max-width: 1200px) {
   .screen-reel {
-    --tile-size: clamp(128px, 16vw, 160px);
+    --tile-size: clamp(132px, 16vw, 170px);
   }
 
   .screen-grid {
@@ -230,6 +247,10 @@ h4 {
 
   .screen-reel {
     height: min(64vh, 560px);
+  }
+
+  .gba-brand {
+    font-size: clamp(1.45rem, 8vw, 2.4rem);
   }
 }
 

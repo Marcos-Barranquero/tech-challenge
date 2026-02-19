@@ -6,37 +6,50 @@ import { usePokemonList } from "../hooks/use-pokemon-list";
 import { PokemonCard } from "./pokemon-card";
 import { PokemonListSkeleton } from "./pokemon-list-skeleton";
 import { PokemonEmptyState } from "./pokemon-empty-state";
+import { PokemonInlineDetail } from "./pokemon-inline-detail";
+import { useState } from "react";
 
 export function PokemonExplorer() {
   const { items, total, isLoading, isFetching } = usePokemonList();
+  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
+  const isDetailView = selectedPokemonId !== null;
 
   return (
-    <main id="main-content" className="relative z-10 mx-auto max-w-6xl px-4 py-6 md:py-8">
-      <header className="mb-5 text-center">
-        <h1 className="pokemon-title mt-1 text-4xl text-yellow-300 md:text-6xl">Pokedex</h1>
-      </header>
-
+    <main id="main-content" className="relative z-10 mx-auto max-w-[1500px] px-4 py-6 md:py-8">
       <section className="gba-console" aria-live="polite">
         <div className="gba-screen-bezel">
           <div className="gba-screen">
             <div className="screen-sticky">
               <p className="px-1 text-sm font-semibold text-poke-ink/75">{isFetching ? "Updating results…" : `${total} results`}</p>
-              <div className="mt-2 grid grid-cols-1 items-center gap-2 md:grid-cols-2">
+              <div
+                aria-hidden={isDetailView}
+                className={`mt-2 grid grid-cols-1 items-center gap-2 md:grid-cols-2 ${
+                  isDetailView ? "pointer-events-none opacity-0" : "opacity-100"
+                }`}
+              >
                 <PokemonSearch />
                 <PokemonFilters />
               </div>
             </div>
 
-            <div className="screen-reel">
-              {isLoading && <PokemonListSkeleton />}
+            <div className={`screen-reel ${isDetailView ? "screen-reel-detail" : ""}`}>
+              {isDetailView && selectedPokemonId !== null && (
+                <PokemonInlineDetail
+                  id={selectedPokemonId}
+                  onBack={() => setSelectedPokemonId(null)}
+                  onSelectEvolution={(id) => setSelectedPokemonId(id)}
+                />
+              )}
 
-              {!isLoading && items.length === 0 && <PokemonEmptyState />}
+              {!isDetailView && isLoading && <PokemonListSkeleton />}
 
-              {!isLoading && items.length > 0 && (
+              {!isDetailView && !isLoading && items.length === 0 && <PokemonEmptyState />}
+
+              {!isDetailView && !isLoading && items.length > 0 && (
                 <div className="screen-grid">
                   {items.map((pokemon) => (
                     <div key={pokemon.id} className="slot-item">
-                      <PokemonCard pokemon={pokemon} />
+                      <PokemonCard pokemon={pokemon} onSelect={setSelectedPokemonId} />
                     </div>
                   ))}
                 </div>
@@ -55,6 +68,10 @@ export function PokemonExplorer() {
             <span />
             <span />
           </div>
+        </div>
+
+        <div className="gba-brand-wrap" aria-hidden="true">
+          <p className="pokemon-title gba-brand text-yellow-300">Pokedex</p>
         </div>
       </section>
     </main>

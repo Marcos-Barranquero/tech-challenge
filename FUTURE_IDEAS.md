@@ -16,3 +16,11 @@
 - Add route-level `not-found` and graceful fallback states.
 - Add outage fallback copy when upstream PokeAPI is unavailable.
 - Add monitoring hooks for error tracking and incident visibility.
+
+## 3. Add Testing Strategy
+
+- Add unit tests for core business logic (evolution chain resolution, list filtering).
+- Add integration tests for tRPC procedures and schema validation.
+- Add component tests for key UI flows (search, filters, inline detail, back navigation).
+- Add end-to-end tests for the full user journey in the GBA interface.
+- Add CI test gates for pull requests (`typecheck`, `unit`, `integration`, `e2e`).
