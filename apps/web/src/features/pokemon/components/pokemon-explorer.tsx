@@ -13,17 +13,18 @@ export function PokemonExplorer() {
   return (
     <main id="main-content" className="relative z-10 mx-auto max-w-6xl px-4 py-6 md:py-8">
       <header className="mb-5 text-center">
-        <p className="text-sm font-bold uppercase tracking-[0.2em] text-poke-primary">Tech Challenge</p>
         <h1 className="pokemon-title mt-1 text-4xl text-yellow-300 md:text-6xl">Pokedex</h1>
       </header>
 
       <section className="gba-console" aria-live="polite">
         <div className="gba-screen-bezel">
           <div className="gba-screen">
-            <div className="screen-sticky space-y-2">
+            <div className="screen-sticky">
               <p className="px-1 text-sm font-semibold text-poke-ink/75">{isFetching ? "Updating results…" : `${total} results`}</p>
-              <PokemonSearch />
-              <PokemonFilters />
+              <div className="mt-2 grid grid-cols-1 items-center gap-2 md:grid-cols-2">
+                <PokemonSearch />
+                <PokemonFilters />
+              </div>
             </div>
 
             <div className="screen-reel">

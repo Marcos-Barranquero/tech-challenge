@@ -10,19 +10,17 @@ export function usePokemonList() {
   const search = usePokemonFiltersStore(pokemonFiltersSelectors.search);
   const selectedType = usePokemonFiltersStore(pokemonFiltersSelectors.selectedType);
   const selectedGeneration = usePokemonFiltersStore(pokemonFiltersSelectors.selectedGeneration);
-  const page = usePokemonFiltersStore(pokemonFiltersSelectors.page);
-  const pageSize = usePokemonFiltersStore(pokemonFiltersSelectors.pageSize);
 
   const queryInput = useMemo(
     () => ({
       search,
       type: selectedType,
       generation: selectedGeneration,
-      page,
-      pageSize,
+      page: 1,
+      pageSize: 60,
       sort: "id-asc" as const
     }),
-    [page, pageSize, search, selectedGeneration, selectedType]
+    [search, selectedGeneration, selectedType]
   );
 
   const listQuery = trpc.pokemon.list.useQuery(queryInput, {

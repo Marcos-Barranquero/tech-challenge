@@ -45,7 +45,7 @@ h4 {
 .gba-console {
   position: relative;
   margin: 0 auto;
-  max-width: 1020px;
+  max-width: 1320px;
   border-radius: 68px;
   border: 3px solid #d8b4fe;
   background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 58%, #6d28d9 100%);
@@ -90,7 +90,7 @@ h4 {
   overflow: hidden;
   border-radius: 16px;
   border: 3px solid #1d4ed8;
-  background: radial-gradient(circle at 50% 0, rgba(56, 189, 248, 0.3), transparent 48%), #e0f2fe;
+  background: radial-gradient(circle at 50% 18%, rgba(56, 189, 248, 0.28), transparent 52%), #e0f2fe;
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.75);
 }
 
@@ -105,18 +105,25 @@ h4 {
 }
 
 .screen-reel {
-  height: min(62vh, 620px);
+  --tile-size: clamp(132px, 11vw, 172px);
+  --grid-gap: 10px;
+  --screen-pad: 16px;
+  height: calc((var(--tile-size) * 2) + var(--grid-gap) + (var(--screen-pad) * 2));
   overflow-y: auto;
   overscroll-behavior: contain;
   scroll-snap-type: y mandatory;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
-  padding: 14px;
+  scroll-padding-top: var(--screen-pad);
+  scroll-padding-bottom: var(--screen-pad);
+  padding: var(--screen-pad) 14px;
 }
 
 .screen-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, var(--tile-size));
+  grid-auto-rows: var(--tile-size);
+  justify-content: center;
+  gap: var(--grid-gap);
+  padding: 0;
 }
 
 .slot-item {
@@ -193,6 +200,18 @@ h4 {
   }
 }
 
+@media (max-width: 1200px) {
+  .screen-reel {
+    --tile-size: clamp(128px, 16vw, 160px);
+  }
+
+  .screen-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: auto;
+    justify-content: stretch;
+  }
+}
+
 @media (max-width: 1024px) {
   .gba-console {
     border-radius: 32px;
@@ -205,11 +224,18 @@ h4 {
   }
 
   .screen-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
   }
 
   .screen-reel {
     height: min(64vh, 560px);
+  }
+}
+
+@media (max-width: 640px) {
+  .screen-grid {
+    grid-template-columns: 1fr;
   }
 }
 

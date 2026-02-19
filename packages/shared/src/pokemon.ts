@@ -46,7 +46,7 @@ export const ListPokemonInputSchema = z.object({
   type: PokemonTypeSchema.optional(),
   generation: GenerationSchema.optional(),
   page: z.number().int().min(1).default(1),
-  pageSize: z.number().int().min(1).max(60).default(20),
+  pageSize: z.number().int().min(1).max(60).default(60),
   sort: z.enum(["id-asc"]).default("id-asc"),
 });
 

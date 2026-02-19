@@ -24,7 +24,7 @@ const DEFAULT_STATE: PokemonFiltersState = {
   selectedType: undefined,
   selectedGeneration: undefined,
   page: 1,
-  pageSize: 20,
+  pageSize: 60,
 };
 
 export type PokemonFiltersStore = PokemonFiltersState & PokemonFiltersActions;
