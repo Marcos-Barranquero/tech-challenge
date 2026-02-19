@@ -65,33 +65,39 @@ export function PokemonExplorer() {
               </div>
             )}
 
-            <div className={`screen-reel ${isDetailView ? "screen-reel-detail" : ""}`}>
-              {isDetailView && selectedPokemonId !== null && (
-                <PokemonInlineDetail
-                  id={selectedPokemonId}
-                  onBack={closeDetail}
-                  onSelectEvolution={openPokemon}
-                  getPokemonHref={getPokemonHref}
-                />
-              )}
+            <div className="screen-reel">
+              <div className={`screen-carousel ${isDetailView ? "is-detail" : ""}`}>
+                <div className="screen-panel screen-panel-list">
+                  {isLoading && <PokemonListSkeleton />}
 
-              {!isDetailView && isLoading && <PokemonListSkeleton />}
+                  {!isLoading && items.length === 0 && <PokemonEmptyState />}
 
-              {!isDetailView && !isLoading && items.length === 0 && <PokemonEmptyState />}
-
-              {!isDetailView && !isLoading && items.length > 0 && (
-                <div className="screen-grid">
-                  {items.map((pokemon) => (
-                    <div key={pokemon.id} className="slot-item">
-                      <PokemonCard
-                        pokemon={pokemon}
-                        href={getPokemonHref(pokemon.id)}
-                        onSelect={openPokemon}
-                      />
+                  {!isLoading && items.length > 0 && (
+                    <div className="screen-grid">
+                      {items.map((pokemon) => (
+                        <div key={pokemon.id} className="slot-item">
+                          <PokemonCard
+                            pokemon={pokemon}
+                            href={getPokemonHref(pokemon.id)}
+                            onSelect={openPokemon}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
+
+                <div className="screen-panel screen-panel-detail">
+                  {selectedPokemonId !== null && (
+                    <PokemonInlineDetail
+                      id={selectedPokemonId}
+                      onBack={closeDetail}
+                      onSelectEvolution={openPokemon}
+                      getPokemonHref={getPokemonHref}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
