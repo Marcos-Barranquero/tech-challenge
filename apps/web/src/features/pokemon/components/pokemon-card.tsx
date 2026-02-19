@@ -2,21 +2,37 @@
 
 import type { PokemonListItem } from "@tech-challenge/shared";
 import Image from "next/image";
+import Link from "next/link";
 import { TYPE_BADGE } from "@/lib/constants";
 
 export function PokemonCard({
   pokemon,
+  href,
   onSelect,
 }: {
   pokemon: PokemonListItem;
+  href: string;
   onSelect: (id: number) => void;
 }) {
   return (
     <article className="group aspect-square h-full overflow-hidden rounded-2xl border-2 border-blue-200 bg-white/95 p-2.5 shadow-claySoft transition duration-200 ease-poke hover:-translate-y-0.5 hover:shadow-clay">
-      <button
-        type="button"
-        onClick={() => onSelect(pokemon.id)}
-        className="relative h-full w-full cursor-pointer overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-b from-white to-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
+      <Link
+        href={href}
+        onClick={(event) => {
+          if (
+            event.defaultPrevented ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey ||
+            event.button !== 0
+          ) {
+            return;
+          }
+          event.preventDefault();
+          onSelect(pokemon.id);
+        }}
+        className="relative block h-full w-full cursor-pointer overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-b from-white to-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
       >
         <div className="absolute inset-0">
           <Image
@@ -54,7 +70,7 @@ export function PokemonCard({
         </div>
 
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white/95 via-white/70 to-transparent" aria-hidden="true" />
-      </button>
+      </Link>
     </article>
   );
 }

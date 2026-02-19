@@ -7,12 +7,49 @@ import { PokemonCard } from "./pokemon-card";
 import { PokemonListSkeleton } from "./pokemon-list-skeleton";
 import { PokemonEmptyState } from "./pokemon-empty-state";
 import { PokemonInlineDetail } from "./pokemon-inline-detail";
-import { useState } from "react";
+import { useCallback, useMemo } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function PokemonExplorer() {
   const { items, total, isLoading, isFetching } = usePokemonList();
-  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const selectedPokemonId = useMemo(() => {
+    const raw = searchParams.get("pokemon");
+    if (!raw) {
+      return null;
+    }
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }, [searchParams]);
+
   const isDetailView = selectedPokemonId !== null;
+  const basePath = pathname || "/";
+
+  const getPokemonHref = useCallback(
+    (id: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("pokemon", String(id));
+      return `${basePath}?${params.toString()}`;
+    },
+    [basePath, searchParams],
+  );
+
+  const openPokemon = useCallback(
+    (id: number) => {
+      router.push(getPokemonHref(id), { scroll: false });
+    },
+    [getPokemonHref, router],
+  );
+
+  const closeDetail = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("pokemon");
+    const query = params.toString();
+    router.push(query ? `${basePath}?${query}` : basePath, { scroll: false });
+  }, [basePath, router, searchParams]);
 
   return (
     <main id="main-content" className="relative z-10 mx-auto max-w-[1500px] px-4 py-6 md:py-8">
@@ -36,8 +73,9 @@ export function PokemonExplorer() {
               {isDetailView && selectedPokemonId !== null && (
                 <PokemonInlineDetail
                   id={selectedPokemonId}
-                  onBack={() => setSelectedPokemonId(null)}
-                  onSelectEvolution={(id) => setSelectedPokemonId(id)}
+                  onBack={closeDetail}
+                  onSelectEvolution={openPokemon}
+                  getPokemonHref={getPokemonHref}
                 />
               )}
 
@@ -49,7 +87,11 @@ export function PokemonExplorer() {
                 <div className="screen-grid">
                   {items.map((pokemon) => (
                     <div key={pokemon.id} className="slot-item">
-                      <PokemonCard pokemon={pokemon} onSelect={setSelectedPokemonId} />
+                      <PokemonCard
+                        pokemon={pokemon}
+                        href={getPokemonHref(pokemon.id)}
+                        onSelect={openPokemon}
+                      />
                     </div>
                   ))}
                 </div>

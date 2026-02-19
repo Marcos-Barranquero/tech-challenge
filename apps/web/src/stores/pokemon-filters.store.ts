@@ -44,6 +44,7 @@ export const usePokemonFiltersStore = create<PokemonFiltersStore>((set) => ({
 
   clearFilters: () =>
     set({
+      search: "",
       selectedType: undefined,
       selectedGeneration: undefined,
       page: 1,

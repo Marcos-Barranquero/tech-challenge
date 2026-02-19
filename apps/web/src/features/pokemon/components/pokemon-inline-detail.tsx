@@ -2,6 +2,7 @@
 
 import { usePokemonDetail } from "../hooks/use-pokemon-detail";
 import Image from "next/image";
+import Link from "next/link";
 import { TYPE_BADGE } from "@/lib/constants";
 import { ChevronLeft } from "lucide-react";
 import type { PokemonType } from "@tech-challenge/shared";
@@ -10,10 +11,12 @@ export function PokemonInlineDetail({
   id,
   onBack,
   onSelectEvolution,
+  getPokemonHref,
 }: {
   id: number;
   onBack: () => void;
   onSelectEvolution: (id: number) => void;
+  getPokemonHref: (id: number) => string;
 }) {
   const { data, isLoading } = usePokemonDetail(id);
 
@@ -72,11 +75,24 @@ export function PokemonInlineDetail({
           <ul className="mt-2 grid grid-cols-2 gap-2">
             {data.evolutions.map((evo) => (
               <li key={evo.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelectEvolution(evo.id)}
+                <Link
+                  href={getPokemonHref(evo.id)}
+                  onClick={(event) => {
+                    if (
+                      event.defaultPrevented ||
+                      event.metaKey ||
+                      event.ctrlKey ||
+                      event.shiftKey ||
+                      event.altKey ||
+                      event.button !== 0
+                    ) {
+                      return;
+                    }
+                    event.preventDefault();
+                    onSelectEvolution(evo.id);
+                  }}
                   aria-current={evo.isCurrent ? "page" : undefined}
-                  className={`w-full cursor-pointer rounded-lg border-2 p-1.5 text-left transition duration-200 ease-poke focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary ${
+                  className={`block w-full cursor-pointer rounded-lg border-2 p-1.5 text-left transition duration-200 ease-poke focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary ${
                     evo.isCurrent ? "border-poke-primary bg-blue-50" : "border-blue-200 bg-white hover:-translate-y-0.5"
                   }`}
                 >
@@ -84,7 +100,7 @@ export function PokemonInlineDetail({
                     <Image src={evo.image} alt={`${evo.name} artwork`} fill sizes="44px" className="object-contain" />
                   </div>
                   <p className="mt-1 truncate text-center text-[10px] font-bold capitalize text-poke-ink">{evo.name}</p>
-                </button>
+                </Link>
               </li>
             ))}
           </ul>
