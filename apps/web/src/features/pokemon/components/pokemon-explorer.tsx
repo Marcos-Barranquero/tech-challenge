@@ -11,7 +11,7 @@ import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function PokemonExplorer() {
-  const { items, total, isLoading, isFetching } = usePokemonList();
+  const { items, isLoading } = usePokemonList();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -57,10 +57,9 @@ export function PokemonExplorer() {
         <div className="gba-screen-bezel">
           <div className="gba-screen">
             <div className="screen-sticky">
-              <p className="px-1 text-sm font-semibold text-poke-ink/75">{isFetching ? "Updating results…" : `${total} results`}</p>
               <div
                 aria-hidden={isDetailView}
-                className={`mt-2 grid grid-cols-1 items-center gap-2 md:grid-cols-2 ${
+                className={`grid grid-cols-1 items-center gap-2 md:grid-cols-2 ${
                   isDetailView ? "pointer-events-none opacity-0" : "opacity-100"
                 }`}
               >
