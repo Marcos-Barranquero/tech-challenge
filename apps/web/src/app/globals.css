@@ -183,6 +183,7 @@ h4 {
 }
 
 .gba-controls {
+  position: relative;
   margin-top: 16px;
   display: flex;
   justify-content: space-between;
@@ -244,6 +245,9 @@ h4 {
 }
 
 .gba-speaker {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   height: 28px;
   width: 72px;
   border-radius: 999px;
