@@ -56,17 +56,14 @@ export function PokemonExplorer() {
       <section className="gba-console" aria-live="polite">
         <div className="gba-screen-bezel">
           <div className="gba-screen">
-            <div className="screen-sticky">
-              <div
-                aria-hidden={isDetailView}
-                className={`grid grid-cols-1 items-center gap-2 md:grid-cols-2 ${
-                  isDetailView ? "pointer-events-none opacity-0" : "opacity-100"
-                }`}
-              >
-                <PokemonSearch />
-                <PokemonFilters />
+            {!isDetailView && (
+              <div className="screen-sticky">
+                <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-2">
+                  <PokemonSearch />
+                  <PokemonFilters />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className={`screen-reel ${isDetailView ? "screen-reel-detail" : ""}`}>
               {isDetailView && selectedPokemonId !== null && (
