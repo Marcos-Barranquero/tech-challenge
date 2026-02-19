@@ -2,6 +2,8 @@
 
 A Pokemon explorer built with TypeScript and Next.js, focused on clean architecture, end-to-end type safety, and responsive UX.
 
+Current documented release: `0.0.2`
+
 ## What It Includes
 
 - Main list sorted by ID.
@@ -11,15 +13,17 @@ A Pokemon explorer built with TypeScript and Next.js, focused on clean architect
   - types.
 - Combined filters by type and generation.
 - Real-time name search that expands to the full evolution chain.
-- Detail page per Pokemon with:
+- In-screen Pokemon detail view (SPA behavior, no URL change) with:
   - name,
   - image,
   - generation,
   - types,
   - stats,
-  - clickable evolutions with clear current-item highlighting.
-- Navigation back from detail preserves list state (search and filters).
+  - clickable evolutions with clear current-item highlighting,
+  - back button that returns to the collection grid.
+- Navigation state is preserved when moving between collection and detail inside the screen.
 - Full page reload resets that client state.
+- Game Boy Advance-inspired floating shell UI with collection and detail rendered inside the same screen frame.
 
 ## Stack
 
@@ -38,6 +42,7 @@ A Pokemon explorer built with TypeScript and Next.js, focused on clean architect
 - Evolution-chain resolution is cached by `evolution-chain` ID.
 - API startup triggers non-blocking cache warm-up to reduce first-interaction latency.
 - UI resilience includes loading states, error boundaries, and toast feedback.
+- Collection-to-detail interaction is implemented as an in-place SPA flow for fast context-preserving navigation.
 
 ## Project Structure
 
