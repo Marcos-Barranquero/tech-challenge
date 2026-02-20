@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.4] - 2026-02-20
+
+### Added
+
+- LLM integration in the API layer for Pokemon detail enrichment:
+  - new `pokemon.aiDescription` procedure in the BFF,
+  - provider abstraction with local Ollama support and deterministic fallback mode,
+  - strict Zod validation for generated payloads.
+- Inline AI content in detail view:
+  - generated description + fun fact shown inside the center panel,
+  - fixed-position `Another` button to regenerate content on demand.
+- Runtime controls for local AI behavior via environment variables (`AI_PROVIDER`, `OLLAMA_URL`, `OLLAMA_MODEL`, token/context/timeouts).
+- `scripts/pokedex-stack.sh` helper to run the stack in `host` AI mode (external Ollama) or `none` mode (fallback only).
+
+### Changed
+
+- Docker setup simplified to remove in-container Ollama runtime and rely on external host Ollama for local acceleration scenarios.
+- Fallback text formatting improved (capitalized Pokemon names and normalized generation labels).
+- Detail accessibility improved for scrollable fun-fact content.
+
+## [0.0.3] - 2026-02-20
+
+### Added
+
+- Test strategy implementation across the monorepo:
+  - API unit and contract tests (services, router, OpenAPI contract coverage),
+  - Web unit/component tests (store, hooks, key UI components),
+  - Playwright E2E tests for collection/detail navigation flow.
+- Accessibility and performance smoke coverage:
+  - dedicated Playwright a11y checks (`@a11y`),
+  - performance smoke checks (`@perf`).
+- CI pipeline in GitHub Actions with staged jobs:
+  - `Typecheck + Unit Tests`,
+  - `E2E + A11y + Perf Smoke`,
+  - Playwright artifact upload on failure.
+
 ## [0.0.2] - 2026-02-19
 
 ### Changed

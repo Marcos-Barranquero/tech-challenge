@@ -116,7 +116,11 @@ export function PokemonInlineDetail({
             <section className="h-1/2 min-h-0 rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2.5">
               <h3 className="gba-ui-font text-[18px] uppercase text-[#1f2033]">Fun Fact</h3>
               <div className="mt-2 flex h-[calc(100%-30px)] min-h-0 flex-col pb-1">
-                <p className="min-h-0 flex-1 overflow-y-auto pr-1 text-[14px] leading-snug text-[#2e3253]">
+                <p
+                  className="min-h-0 flex-1 overflow-y-auto pr-1 text-[14px] leading-snug text-[#2e3253]"
+                  tabIndex={0}
+                  aria-label="Pokemon fun fact"
+                >
                   {aiDescriptionQuery.data
                     ? `${aiDescriptionQuery.data.description} ${aiDescriptionQuery.data.funFact}`
                     : (aiDescriptionQuery.isLoading
