@@ -14,12 +14,13 @@ export async function getPokemonAIDescription(
 
   const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
   const model = process.env.OLLAMA_MODEL ?? "qwen2:0.5b";
-  const cacheKey = `pokemon:${input.id}:ai-description:${provider}:${model}:v2`;
+  const cacheKey = `pokemon:${input.id}:ai-description:${input.locale}:${provider}:${model}:v3`;
 
   const createResponse = async () => {
     const generated = await generatePokemonDescription({
       id: detail.id,
       name: detail.name,
+      locale: input.locale,
       generation: detail.generation,
       types: detail.types,
       stats: detail.stats,

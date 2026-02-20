@@ -9,6 +9,7 @@ import { PokemonEmptyState } from "./pokemon-empty-state";
 import { PokemonInlineDetail } from "./pokemon-inline-detail";
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function PokemonExplorer() {
   const { items, isLoading } = usePokemonList();
@@ -127,6 +128,9 @@ export function PokemonExplorer() {
           <p className="pokemon-title gba-brand text-yellow-300">POKEDEX</p>
         </div>
       </section>
+      <div className="mt-4 flex justify-center">
+        <LanguageSwitcher />
+      </div>
     </main>
   );
 }

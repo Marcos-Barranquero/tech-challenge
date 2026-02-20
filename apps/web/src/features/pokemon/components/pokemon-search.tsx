@@ -1,6 +1,7 @@
 "use client";
 
 import { pokemonFiltersSelectors, usePokemonFiltersStore } from "@/stores/pokemon-filters.store";
+import { useTranslations } from "next-intl";
 
 function PokeballIcon() {
   return (
@@ -23,11 +24,12 @@ function PokeballIcon() {
 export function PokemonSearch() {
   const search = usePokemonFiltersStore(pokemonFiltersSelectors.search);
   const setSearch = usePokemonFiltersStore((s) => s.setSearch);
+  const t = useTranslations("search");
 
   return (
     <div className="relative">
       <label htmlFor="pokemon-search" className="sr-only">
-        Search Pokemon and evolutions
+        {t("label")}
       </label>
       <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-indigo-700">
         <PokeballIcon />
@@ -37,7 +39,7 @@ export function PokemonSearch() {
         name="pokemonSearch"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search (e.g. pikachu)…"
+        placeholder={t("placeholder")}
         autoComplete="off"
         spellCheck={false}
         className="gba-ui-font h-14 w-full rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] pl-12 pr-4 text-[20px] text-[#1f2033] placeholder:text-[16px] placeholder:text-[#62648a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"

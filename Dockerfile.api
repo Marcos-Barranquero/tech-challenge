@@ -1,9 +1,11 @@
 # syntax=docker/dockerfile:1.7
 
-FROM node:25-alpine AS base
+FROM node:22-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN npm install -g corepack@latest \
+  && corepack enable \
+  && corepack prepare pnpm@10.0.0 --activate
 WORKDIR /app
 
 FROM base AS deps
@@ -18,7 +20,7 @@ COPY packages/shared ./packages/shared
 RUN pnpm --filter @tech-challenge/shared build
 RUN pnpm --filter @tech-challenge/api build
 
-FROM node:25-alpine AS runtime
+FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
