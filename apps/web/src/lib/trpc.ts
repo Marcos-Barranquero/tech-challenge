@@ -2,7 +2,7 @@
 
 import { QueryClient } from "@tanstack/react-query";
 import { createTRPCReact } from "@trpc/react-query";
-import { httpBatchLink } from "@trpc/client";
+import { httpLink } from "@trpc/client";
 import type { AppRouter } from "@tech-challenge/api/router";
 import superjson from "superjson";
 import { useState } from "react";
@@ -27,7 +27,7 @@ export function useTrpcClient() {
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
-        httpBatchLink({
+        httpLink({
           url: `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"}/trpc`,
           transformer: superjson
         })

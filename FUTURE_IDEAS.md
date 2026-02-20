@@ -38,3 +38,10 @@
 - Deploy the BFF API to a managed platform and wire production `NEXT_PUBLIC_API_URL`.
 - Add CORS and environment hardening for the public Pages domain.
 - Document a zero-cost deployment path (free tiers, no custom domain) for quick demos.
+
+## 6. Extend Local LLM Runtime Integration
+
+- Expand AI insight features using an external local LLM runtime (Ollama host service).
+- Implement a provider abstraction (`cloud` vs `local`) to keep business logic provider-agnostic.
+- Validate model outputs with strict Zod schemas and cache AI responses aggressively.
+- Benchmark latency and memory footprint on Apple Silicon (16 GB baseline) and tune model size.

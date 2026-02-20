@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GenerationSchema, PokemonTypeSchema } from "@tech-challenge/shared";
 import { appRouter } from "./index.js";
 import { PokeApiError } from "../lib/pokeapi-client.js";
+import { AiProviderError } from "../lib/ai-provider.js";
 
 vi.mock("../services/pokemon.service.js", () => ({
   listPokemon: vi.fn(),
@@ -9,15 +10,21 @@ vi.mock("../services/pokemon.service.js", () => ({
   searchWithEvolutions: vi.fn(),
 }));
 
+vi.mock("../services/pokemon-ai.service.js", () => ({
+  getPokemonAIDescription: vi.fn(),
+}));
+
 import {
   getPokemonDetail,
   listPokemon,
   searchWithEvolutions,
 } from "../services/pokemon.service.js";
+import { getPokemonAIDescription } from "../services/pokemon-ai.service.js";
 
 const listPokemonMock = vi.mocked(listPokemon);
 const getPokemonDetailMock = vi.mocked(getPokemonDetail);
 const searchWithEvolutionsMock = vi.mocked(searchWithEvolutions);
+const getPokemonAIDescriptionMock = vi.mocked(getPokemonAIDescription);
 
 describe("pokemon router", () => {
   const caller = appRouter.createCaller({});
@@ -67,5 +74,30 @@ describe("pokemon router", () => {
 
     expect(detail.id).toBe(25);
     expect(search.groups).toEqual([]);
+  });
+
+  it("returns aiDescription from service", async () => {
+    getPokemonAIDescriptionMock.mockResolvedValueOnce({
+      id: 25,
+      name: "pikachu",
+      funFact: "Pikachu stores electricity in its cheeks and discharges when threatened.",
+      provider: "none",
+      model: "none",
+      generatedAt: "2026-02-20T10:00:00.000Z",
+    });
+
+    const result = await caller.pokemon.aiDescription({ id: 25, forceRegenerate: false });
+
+    expect(result.funFact).toContain("Pikachu");
+    expect(result.provider).toBe("none");
+  });
+
+  it("maps AiProviderError to BAD_GATEWAY on aiDescription", async () => {
+    getPokemonAIDescriptionMock.mockRejectedValueOnce(new AiProviderError("timeout", 408));
+
+    await expect(caller.pokemon.aiDescription({ id: 25, forceRegenerate: false })).rejects.toMatchObject({
+      code: "BAD_GATEWAY",
+      message: "AI provider is unavailable",
+    });
   });
 });
