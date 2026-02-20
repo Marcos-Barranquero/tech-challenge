@@ -24,3 +24,10 @@
 - Add component tests for key UI flows (search, filters, inline detail, back navigation).
 - Add end-to-end tests for the full user journey in the GBA interface.
 - Add CI test gates for pull requests (`typecheck`, `unit`, `integration`, `e2e`).
+
+## 4. Add a Technical Retrospective Document
+
+- Add a short engineering retrospective describing what would be done differently in a second iteration.
+- Include architecture trade-offs taken under time constraints and what to improve first.
+- Document UX decisions that worked well vs. decisions that created friction.
+- Outline a phased improvement plan (performance, maintainability, accessibility, testing).
