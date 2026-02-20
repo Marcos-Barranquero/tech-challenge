@@ -103,6 +103,22 @@ export const SearchWithEvolutionsOutputSchema = z.object({
   ),
 });
 
+export const PokemonAIDescriptionInputSchema = z.object({
+  id: z.number().int().positive(),
+  forceRegenerate: z.boolean().default(false),
+  regenerationNonce: z.number().int().positive().optional(),
+});
+
+export const PokemonAIDescriptionOutputSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string(),
+  description: z.string().min(1).max(800),
+  funFact: z.string().min(1).max(300),
+  provider: z.string(),
+  model: z.string(),
+  generatedAt: z.string(),
+});
+
 export type PokemonType = z.infer<typeof PokemonTypeSchema>;
 export type Generation = z.infer<typeof GenerationSchema>;
 export type PokemonListItem = z.infer<typeof PokemonListItemSchema>;
@@ -115,4 +131,10 @@ export type SearchWithEvolutionsInput = z.infer<
 >;
 export type SearchWithEvolutionsOutput = z.infer<
   typeof SearchWithEvolutionsOutputSchema
+>;
+export type PokemonAIDescriptionInput = z.infer<
+  typeof PokemonAIDescriptionInputSchema
+>;
+export type PokemonAIDescriptionOutput = z.infer<
+  typeof PokemonAIDescriptionOutputSchema
 >;

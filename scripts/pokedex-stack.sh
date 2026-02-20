@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PID_DIR="$ROOT_DIR/.run"
+OLLAMA_PID_FILE="$PID_DIR/ollama.pid"
+
+AI_MODE="host"
+MODEL="${OLLAMA_MODEL:-qwen2:0.5b}"
+ACTION="${1:-}"
+SERVICE="${2:-}"
+OLLAMA_FLASH_ATTENTION_VALUE="${OLLAMA_FLASH_ATTENTION:-1}"
+OLLAMA_KV_CACHE_TYPE_VALUE="${OLLAMA_KV_CACHE_TYPE:-q8_0}"
+OLLAMA_LLM_LIBRARY_VALUE="${OLLAMA_LLM_LIBRARY:-metal}"
+OLLAMA_KEEP_ALIVE_VALUE="${OLLAMA_KEEP_ALIVE:-24h}"
+OLLAMA_NUM_PARALLEL_VALUE="${OLLAMA_NUM_PARALLEL:-2}"
+
+print_help() {
+  cat <<'EOF'
+Usage:
+  ./scripts/pokedex-stack.sh up [--ai host|none] [--model MODEL]
+  ./scripts/pokedex-stack.sh down [--ai host|none]
+  ./scripts/pokedex-stack.sh status
+  ./scripts/pokedex-stack.sh logs [service]
+
+Examples:
+  ./scripts/pokedex-stack.sh up --ai host --model phi3:mini
+  ./scripts/pokedex-stack.sh down --ai host
+  ./scripts/pokedex-stack.sh logs api
+EOF
+}
+
+parse_flags() {
+  if [[ $# -gt 0 ]]; then
+    shift
+  fi
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --ai)
+        AI_MODE="${2:-}"
+        shift 2
+        ;;
+      --model)
+        MODEL="${2:-}"
+        shift 2
+        ;;
+      --help|-h)
+        print_help
+        exit 0
+        ;;
+      *)
+        echo "Unknown option: $1"
+        print_help
+        exit 1
+        ;;
+    esac
+  done
+}
+
+ensure_compose() {
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "Docker is required."
+    exit 1
+  fi
+}
+
+ensure_ollama_running_host() {
+  if ! command -v ollama >/dev/null 2>&1; then
+    echo "Ollama CLI not found in PATH. Install Ollama or run with --ai none."
+    exit 1
+  fi
+
+  mkdir -p "$PID_DIR"
+  if curl -fsS "http://127.0.0.1:11434/api/tags" >/dev/null 2>&1; then
+    echo "Ollama host is already running."
+  else
+    echo "Starting Ollama host service..."
+    nohup env \
+      OLLAMA_FLASH_ATTENTION="$OLLAMA_FLASH_ATTENTION_VALUE" \
+      OLLAMA_KV_CACHE_TYPE="$OLLAMA_KV_CACHE_TYPE_VALUE" \
+      OLLAMA_LLM_LIBRARY="$OLLAMA_LLM_LIBRARY_VALUE" \
+      OLLAMA_KEEP_ALIVE="$OLLAMA_KEEP_ALIVE_VALUE" \
+      OLLAMA_NUM_PARALLEL="$OLLAMA_NUM_PARALLEL_VALUE" \
+      ollama serve >/tmp/pokedex-ollama.log 2>&1 &
+    echo $! > "$OLLAMA_PID_FILE"
+    sleep 2
+  fi
+
+  echo "Pulling model $MODEL on host..."
+  ollama pull "$MODEL"
+}
+
+stop_ollama_host_if_managed() {
+  if [[ -f "$OLLAMA_PID_FILE" ]]; then
+    local pid
+    pid="$(cat "$OLLAMA_PID_FILE")"
+    if kill -0 "$pid" >/dev/null 2>&1; then
+      echo "Stopping managed Ollama process ($pid)..."
+      kill "$pid" || true
+    fi
+    rm -f "$OLLAMA_PID_FILE"
+  fi
+}
+
+up_stack() {
+  ensure_compose
+  cd "$ROOT_DIR"
+
+  case "$AI_MODE" in
+    host)
+      ensure_ollama_running_host
+      echo "Starting stack with Ollama on host (Metal acceleration on Apple Silicon)..."
+      OLLAMA_URL="http://host.docker.internal:11434" \
+      OLLAMA_MODEL="$MODEL" \
+      AI_PROVIDER=auto \
+      docker compose up -d --build
+      ;;
+    none)
+      echo "Starting stack with AI disabled..."
+      AI_PROVIDER=none docker compose up -d --build
+      ;;
+    *)
+      echo "Invalid --ai mode: $AI_MODE"
+      exit 1
+      ;;
+  esac
+
+  echo "Web: http://localhost:3000"
+  echo "API: http://localhost:4000/health"
+}
+
+down_stack() {
+  ensure_compose
+  cd "$ROOT_DIR"
+  docker compose down --remove-orphans
+  if [[ "$AI_MODE" == "host" ]]; then
+    stop_ollama_host_if_managed
+  fi
+}
+
+status_stack() {
+  ensure_compose
+  cd "$ROOT_DIR"
+  docker compose ps
+}
+
+logs_stack() {
+  ensure_compose
+  cd "$ROOT_DIR"
+  if [[ -n "$SERVICE" ]]; then
+    docker compose logs -f "$SERVICE"
+  else
+    docker compose logs -f
+  fi
+}
+
+case "$ACTION" in
+  up)
+    parse_flags "$@"
+    up_stack
+    ;;
+  down)
+    parse_flags "$@"
+    down_stack
+    ;;
+  status)
+    status_stack
+    ;;
+  logs)
+    logs_stack
+    ;;
+  --help|-h|"")
+    print_help
+    ;;
+  *)
+    echo "Unknown action: $ACTION"
+    print_help
+    exit 1
+    ;;
+esac
