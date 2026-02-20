@@ -16,7 +16,7 @@ describe("LanguageSwitcher", () => {
     const user = userEvent.setup();
     render(<LanguageSwitcher />);
 
-    await user.click(screen.getByRole("button", { name: /espanol/i }));
+    await user.click(screen.getByRole("button", { name: /español/i }));
 
     expect(useLocaleStore.getState().locale).toBe("es");
   });

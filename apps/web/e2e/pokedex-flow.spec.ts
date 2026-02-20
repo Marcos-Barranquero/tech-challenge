@@ -68,7 +68,7 @@ test.describe("Pokedex flow", () => {
   test("switches language to spanish and updates main labels", async ({ page }) => {
     await waitForCollectionReady(page);
 
-    await page.getByRole("button", { name: /espanol/i }).click();
+    await page.getByRole("button", { name: /español/i }).click();
 
     await expect(page.getByRole("textbox", { name: /buscar pokemon y evoluciones/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /^limpiar$/i })).toBeVisible();

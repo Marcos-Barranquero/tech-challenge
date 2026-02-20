@@ -13,8 +13,8 @@ export type LocaleOption = {
 
 export const LOCALE_OPTIONS: LocaleOption[] = [
   { locale: "en", label: "English", shortLabel: "EN", flag: "🇬🇧" },
-  { locale: "es", label: "Espanol", shortLabel: "ES", flag: "🇪🇸" },
+  { locale: "es", label: "Español", shortLabel: "ES", flag: "🇪🇸" },
   { locale: "it", label: "Italiano", shortLabel: "IT", flag: "🇮🇹" },
-  { locale: "pt", label: "Portugues", shortLabel: "PT", flag: "🇵🇹" },
+  { locale: "pt", label: "Português", shortLabel: "PT", flag: "🇵🇹" },
   { locale: "de", label: "Deutsch", shortLabel: "DE", flag: "🇩🇪" },
 ];

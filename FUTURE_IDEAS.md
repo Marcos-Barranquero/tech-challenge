@@ -45,3 +45,11 @@
 - Implement a provider abstraction (`cloud` vs `local`) to keep business logic provider-agnostic.
 - Validate model outputs with strict Zod schemas and cache AI responses aggressively.
 - Benchmark latency and memory footprint on Apple Silicon (16 GB baseline) and tune model size.
+
+## 7. Add Xbox Gamepad Support
+
+- Add Web Gamepad API support to map Xbox controller inputs to GBA-like actions.
+- Support directional navigation through Pokemon grid, filters, and detail evolutions.
+- Map buttons for primary actions (`A` open/select, `B` back, shoulder buttons for quick navigation).
+- Add controller connection status and input hints in the UI.
+- Provide keyboard fallback and accessibility-safe behavior when no gamepad is available.
