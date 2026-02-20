@@ -13,7 +13,7 @@ Current documented release: `0.0.2`
   - types.
 - Combined filters by type and generation.
 - Real-time name search that expands to the full evolution chain.
-- In-screen Pokemon detail view (SPA behavior, no URL change) with:
+- In-screen Pokemon detail view (SPA behavior with dynamic query-string URL, no full page reload) with:
   - name,
   - image,
   - generation,
@@ -84,6 +84,68 @@ pnpm dev
 - `pokemon.searchWithEvolutions`
 - `pokemon.meta`
 
+## Versioned REST + OpenAPI Contract
+
+- OpenAPI JSON: `http://localhost:4000/openapi/v1.json`
+- Swagger UI: `http://localhost:4000/docs`
+- Versioned REST endpoints (`v1`):
+  - `GET /v1/pokemon`
+  - `GET /v1/pokemon/{id}`
+  - `GET /v1/pokemon/search/evolutions`
+  - `GET /v1/pokemon/meta`
+
+The contract is generated from shared Zod schemas in `packages/shared` (single source of truth).
+
+## API Architecture (tRPC + REST)
+
+```mermaid
+flowchart LR
+  A["Next.js Web App"] --> B["tRPC Client"]
+  B --> C["/trpc (Fastify adapter)"]
+  R["External REST Client"] --> D["/v1/* REST routes"]
+  D --> E["Zod validation (shared schemas)"]
+  C --> E
+  E --> F["Service layer (pokemon.service, evolution.service, index service)"]
+  F --> G["Cache layer (LRU)"]
+  F --> H["PokeAPI"]
+  D --> I["OpenAPI v1 (/openapi/v1.json)"]
+  I --> J["Swagger UI (/docs)"]
+```
+
+- The frontend uses `tRPC` by default.
+- REST `v1` is available for external integrations and contract-first documentation.
+- Both entrypoints share the same business logic and schema contracts.
+
+## Testing
+
+### Unit + Integration (web + api)
+
+```bash
+pnpm test
+pnpm test:coverage
+```
+
+### E2E (Playwright)
+
+```bash
+pnpm exec playwright install chromium
+pnpm test:e2e
+pnpm test:a11y
+```
+
+### Performance Smoke
+
+```bash
+pnpm test:perf:smoke
+```
+
 ## Changelog
 
 See `CHANGELOG.md` for release history.
+
+## Dependency Maintenance
+
+- Dependabot is configured in `.github/dependabot.yml` for:
+  - npm/pnpm workspace dependencies,
+  - GitHub Actions,
+  - Docker images.

@@ -7,7 +7,10 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.16",
@@ -27,10 +30,15 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "autoprefixer": "^10.4.20",
+    "happy-dom": "^20.6.3",
+    "jsdom": "^28.1.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
