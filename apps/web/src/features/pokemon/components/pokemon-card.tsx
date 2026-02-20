@@ -15,7 +15,7 @@ export function PokemonCard({
   onSelect: (id: number) => void;
 }) {
   return (
-    <article className="group aspect-square h-full overflow-hidden rounded-2xl border-2 border-blue-200 bg-white/95 p-2.5 shadow-claySoft transition duration-200 ease-poke hover:-translate-y-0.5 hover:shadow-clay">
+    <article className="group aspect-square h-full overflow-hidden rounded-md border-[3px] border-[#5b4d91] bg-[#e6e2fa] p-1.5 shadow-[0_4px_0_#4c3d7d,0_10px_18px_rgba(37,30,77,0.22)] transition duration-200 ease-poke hover:-translate-y-0.5">
       <Link
         href={href}
         onClick={(event) => {
@@ -32,8 +32,9 @@ export function PokemonCard({
           event.preventDefault();
           onSelect(pokemon.id);
         }}
-        className="relative block h-full w-full cursor-pointer overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-b from-white to-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
+        className="relative block h-full w-full cursor-pointer overflow-hidden rounded-[6px] border-2 border-[#8479b8] bg-gradient-to-b from-[#fbfaff] to-[#f1eeff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
       >
+        <div className="absolute inset-x-0 top-0 z-0 h-7 bg-gradient-to-b from-[#d8d2f4] to-transparent" aria-hidden="true" />
         <div className="absolute inset-0">
           <Image
             src={pokemon.image}
@@ -44,24 +45,27 @@ export function PokemonCard({
           />
         </div>
 
-        <div className="absolute left-0 top-0 z-10 p-2">
-          <p className="text-left text-[10px] font-bold uppercase tracking-wide text-poke-primary">
+        <div className="absolute left-1.5 top-1 z-10">
+          <p className="gba-ui-font text-left text-[12px] uppercase text-[#4c3f7d]">
             #{pokemon.id.toString().padStart(4, "0")}
           </p>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 z-10 p-2">
-          <h3 className="mt-0.5 break-words text-sm font-bold capitalize leading-tight text-poke-ink">
+          <h3 className="gba-ui-font gba-stroked-text mt-0.5 truncate text-center text-[18px] capitalize leading-tight">
             {pokemon.name}
           </h3>
 
-          <div className="mt-1 flex min-w-0 items-center gap-1.5">
-            <span className="shrink-0 text-[10px] font-semibold uppercase text-poke-ink/70">
+          <div className="mt-1 flex min-w-0 items-center justify-between gap-1.5">
+            <span className="gba-ui-font shrink-0 text-[10px] uppercase text-[#4b4d71] text-left">
               {pokemon.generation.replace("generation-", "GEN ").toUpperCase()}
             </span>
-            <ul className="flex min-w-0 flex-wrap gap-1" aria-label="Pokemon types">
+            <ul className="flex min-w-0 flex-wrap justify-end gap-1" aria-label="Pokemon types">
               {pokemon.types.map((type) => (
-                <li key={type} className={`rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase ${TYPE_BADGE[type]}`}>
+                <li
+                  key={type}
+                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[10px] uppercase ${TYPE_BADGE[type]}`}
+                >
                   {type}
                 </li>
               ))}
@@ -69,7 +73,6 @@ export function PokemonCard({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white/95 via-white/70 to-transparent" aria-hidden="true" />
       </Link>
     </article>
   );

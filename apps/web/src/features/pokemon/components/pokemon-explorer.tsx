@@ -102,12 +102,21 @@ export function PokemonExplorer() {
           </div>
         </div>
 
-        <div className="gba-controls" aria-hidden="true">
-          <div className="gba-dpad">
-            <span />
-            <span />
+        <div className="gba-controls gba-ui-font" aria-hidden="true">
+          <div className="flex items-end gap-3">
+            <div className="gba-dpad">
+              <span />
+              <span />
+            </div>
+            <div className="gba-start-select">
+              <span>START</span>
+              <span>SELECT</span>
+            </div>
           </div>
-          <div className="gba-speaker" />
+          <div className="gba-center-brand">
+            <small>Nintendo</small>
+            <strong>GAME BOY ADVANCE</strong>
+          </div>
           <div className="gba-buttons">
             <span />
             <span />
@@ -115,7 +124,7 @@ export function PokemonExplorer() {
         </div>
 
         <div className="gba-brand-wrap" aria-hidden="true">
-          <p className="pokemon-title gba-brand text-yellow-300">Pokedex</p>
+          <p className="pokemon-title gba-brand text-yellow-300">POKEDEX</p>
         </div>
       </section>
     </main>

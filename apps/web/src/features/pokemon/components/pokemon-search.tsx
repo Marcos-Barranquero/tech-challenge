@@ -7,7 +7,7 @@ function PokeballIcon() {
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="size-4"
+      className="size-6"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -29,7 +29,7 @@ export function PokemonSearch() {
       <label htmlFor="pokemon-search" className="sr-only">
         Search Pokemon and evolutions
       </label>
-      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-poke-primary">
+      <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-indigo-700">
         <PokeballIcon />
       </span>
       <input
@@ -40,7 +40,7 @@ export function PokemonSearch() {
         placeholder="Search (e.g. pikachu)…"
         autoComplete="off"
         spellCheck={false}
-        className="h-10 w-full rounded-xl border-2 border-blue-200 bg-white pl-9 pr-3 text-sm text-poke-ink placeholder:text-poke-ink/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
+        className="gba-ui-font h-14 w-full rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] pl-12 pr-4 text-[20px] text-[#1f2033] placeholder:text-[16px] placeholder:text-[#62648a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
       />
     </div>
   );

@@ -23,7 +23,7 @@ export function PokemonFilters() {
           name="type"
           value={selectedType ?? ""}
           onChange={(e) => setType((e.target.value || undefined) as PokemonType | undefined)}
-          className="h-10 w-full cursor-pointer rounded-xl border-2 border-blue-200 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
+          className="gba-ui-font h-14 w-full cursor-pointer rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] px-4 text-[20px] text-[#1f2033] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
         >
           <option value="">Type: All</option>
           {data?.types.map((type) => (
@@ -43,7 +43,7 @@ export function PokemonFilters() {
           name="generation"
           value={selectedGeneration ?? ""}
           onChange={(e) => setGeneration((e.target.value || undefined) as Generation | undefined)}
-          className="h-10 w-full cursor-pointer rounded-xl border-2 border-blue-200 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
+          className="gba-ui-font h-14 w-full cursor-pointer rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] px-4 text-[20px] text-[#1f2033] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
         >
           <option value="">Generation: All</option>
           {data?.generations.map((generation) => (
@@ -57,7 +57,7 @@ export function PokemonFilters() {
       <button
         type="button"
         onClick={clearFilters}
-        className="h-10 w-full cursor-pointer rounded-xl border-2 border-poke-primary bg-white px-3 text-sm font-semibold text-poke-primary transition-transform duration-200 ease-poke hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-primary"
+        className="gba-ui-font h-14 w-full cursor-pointer rounded-md border-2 border-[#4f46e5] bg-[#ece9ff] px-4 text-[20px] text-[#312e81] transition duration-200 ease-poke hover:bg-[#e4e1ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
       >
         Clear
       </button>
