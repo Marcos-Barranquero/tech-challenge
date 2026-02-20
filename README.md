@@ -96,6 +96,26 @@ pnpm dev
 
 The contract is generated from shared Zod schemas in `packages/shared` (single source of truth).
 
+## API Architecture (tRPC + REST)
+
+```mermaid
+flowchart LR
+  A["Next.js Web App"] --> B["tRPC Client"]
+  B --> C["/trpc (Fastify adapter)"]
+  R["External REST Client"] --> D["/v1/* REST routes"]
+  D --> E["Zod validation (shared schemas)"]
+  C --> E
+  E --> F["Service layer (pokemon.service, evolution.service, index service)"]
+  F --> G["Cache layer (LRU)"]
+  F --> H["PokeAPI"]
+  D --> I["OpenAPI v1 (/openapi/v1.json)"]
+  I --> J["Swagger UI (/docs)"]
+```
+
+- The frontend uses `tRPC` by default.
+- REST `v1` is available for external integrations and contract-first documentation.
+- Both entrypoints share the same business logic and schema contracts.
+
 ## Testing
 
 ### Unit + Integration (web + api)
