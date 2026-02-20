@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GenerationSchema, PokemonTypeSchema } from "@tech-challenge/shared";
 import { appRouter } from "./index.js";
 import { PokeApiError } from "../lib/pokeapi-client.js";
 
@@ -43,8 +44,8 @@ describe("pokemon router", () => {
 
   it("returns meta values", async () => {
     const meta = await caller.pokemon.meta();
-    expect(meta.types.length).toBeGreaterThan(0);
-    expect(meta.generations.length).toBe(9);
+    expect(meta.types).toEqual(PokemonTypeSchema.options);
+    expect(meta.generations).toEqual(GenerationSchema.options);
   });
 
   it("delegates to service for detail and searchWithEvolutions", async () => {

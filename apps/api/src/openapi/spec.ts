@@ -17,9 +17,28 @@ import { API_PREFIX, OPENAPI_SPEC_VERSION } from "./version.js";
 
 extendZodWithOpenApi(z);
 
-const ErrorResponseSchema = z.object({
+const BaseErrorSchema = z.object({
   error: z.string(),
-  code: z.string().optional(),
+  code: z.string(),
+});
+
+const ValidationErrorSchema = BaseErrorSchema.extend({
+  code: z.literal("BAD_REQUEST"),
+  issues: z.array(z.unknown()),
+});
+
+const NotFoundErrorSchema = BaseErrorSchema.extend({
+  code: z.literal("NOT_FOUND"),
+});
+
+const UpstreamErrorSchema = BaseErrorSchema.extend({
+  code: z.literal("BAD_GATEWAY"),
+  endpoint: z.string().optional(),
+  status: z.number().int().optional(),
+});
+
+const InternalErrorSchema = BaseErrorSchema.extend({
+  code: z.literal("INTERNAL_SERVER_ERROR"),
 });
 
 const MetaOutputSchema = z.object({
@@ -40,7 +59,10 @@ function createRegistry() {
   registry.register("SearchWithEvolutionsInput", SearchWithEvolutionsInputSchema);
   registry.register("SearchWithEvolutionsOutput", SearchWithEvolutionsOutputSchema);
   registry.register("MetaOutput", MetaOutputSchema);
-  registry.register("ErrorResponse", ErrorResponseSchema);
+  registry.register("ValidationError", ValidationErrorSchema);
+  registry.register("NotFoundError", NotFoundErrorSchema);
+  registry.register("UpstreamError", UpstreamErrorSchema);
+  registry.register("InternalError", InternalErrorSchema);
 
   registry.registerPath({
     method: "get",
@@ -64,7 +86,7 @@ function createRegistry() {
         description: "Invalid request input",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: ValidationErrorSchema,
           },
         },
       },
@@ -72,7 +94,15 @@ function createRegistry() {
         description: "Upstream PokeAPI unavailable",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: UpstreamErrorSchema,
+          },
+        },
+      },
+      500: {
+        description: "Unexpected server error",
+        content: {
+          "application/json": {
+            schema: InternalErrorSchema,
           },
         },
       },
@@ -100,7 +130,7 @@ function createRegistry() {
         description: "Invalid request input",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: ValidationErrorSchema,
           },
         },
       },
@@ -108,7 +138,7 @@ function createRegistry() {
         description: "Pokemon not found",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: NotFoundErrorSchema,
           },
         },
       },
@@ -116,7 +146,15 @@ function createRegistry() {
         description: "Upstream PokeAPI unavailable",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: UpstreamErrorSchema,
+          },
+        },
+      },
+      500: {
+        description: "Unexpected server error",
+        content: {
+          "application/json": {
+            schema: InternalErrorSchema,
           },
         },
       },
@@ -145,7 +183,7 @@ function createRegistry() {
         description: "Invalid request input",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: ValidationErrorSchema,
           },
         },
       },
@@ -153,7 +191,15 @@ function createRegistry() {
         description: "Upstream PokeAPI unavailable",
         content: {
           "application/json": {
-            schema: ErrorResponseSchema,
+            schema: UpstreamErrorSchema,
+          },
+        },
+      },
+      500: {
+        description: "Unexpected server error",
+        content: {
+          "application/json": {
+            schema: InternalErrorSchema,
           },
         },
       },
@@ -197,4 +243,3 @@ export function getOpenApiDocument(serverUrl?: string) {
     servers,
   });
 }
-

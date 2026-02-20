@@ -132,19 +132,11 @@ async function bootstrap() {
       const query = request.query as Record<string, unknown>;
       const input = ListPokemonInputSchema.parse({
         search: typeof query.search === "string" ? query.search : "",
-        type:
-          typeof query.type === "string" &&
-          PokemonTypeSchema.options.includes(query.type as (typeof PokemonTypeSchema.options)[number])
-            ? query.type
-            : undefined,
-        generation:
-          typeof query.generation === "string" &&
-          GenerationSchema.options.includes(query.generation as (typeof GenerationSchema.options)[number])
-            ? query.generation
-            : undefined,
+        type: typeof query.type === "string" ? query.type : undefined,
+        generation: typeof query.generation === "string" ? query.generation : undefined,
         page: parseNumber(query.page) ?? 1,
         pageSize: parseNumber(query.pageSize) ?? 60,
-        sort: query.sort === "id-asc" ? "id-asc" : "id-asc",
+        sort: "id-asc",
       });
 
       const result = await listPokemon(input);
