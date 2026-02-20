@@ -16,7 +16,7 @@
     "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@asteasolutions/zod-to-openapi": "^8.4.1",
     "@fastify/cors": "^11.0.0",
     "@tech-challenge/shared": "workspace:*",
     "@trpc/server": "^11.0.0",
