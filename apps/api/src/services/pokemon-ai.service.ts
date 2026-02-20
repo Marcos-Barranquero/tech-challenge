@@ -12,8 +12,8 @@ export async function getPokemonAIDescription(
 ): Promise<PokemonAIDescriptionOutput> {
   const detail = await getPokemonDetail({ id: input.id });
 
-  const provider = (process.env.AI_PROVIDER ?? "none").toLowerCase();
-  const model = process.env.OLLAMA_MODEL ?? "none";
+  const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
+  const model = process.env.OLLAMA_MODEL ?? "qwen2:0.5b";
   const cacheKey = `pokemon:${input.id}:ai-description:${provider}:${model}:v2`;
 
   const createResponse = async () => {
@@ -30,7 +30,6 @@ export async function getPokemonAIDescription(
     return PokemonAIDescriptionOutputSchema.parse({
       id: detail.id,
       name: detail.name,
-      description: generated.description,
       funFact: generated.funFact,
       provider: generated.provider,
       model: generated.model,

@@ -3,6 +3,7 @@ import {
   PokemonDetailOutputSchema,
   PokemonTypeSchema,
   GenerationSchema,
+  PokemonAIDescriptionOutputSchema,
   SearchWithEvolutionsOutputSchema,
 } from "@tech-challenge/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -14,15 +15,21 @@ vi.mock("../services/pokemon.service.js", () => ({
   searchWithEvolutions: vi.fn(),
 }));
 
+vi.mock("../services/pokemon-ai.service.js", () => ({
+  getPokemonAIDescription: vi.fn(),
+}));
+
 import {
   getPokemonDetail,
   listPokemon,
   searchWithEvolutions,
 } from "../services/pokemon.service.js";
+import { getPokemonAIDescription } from "../services/pokemon-ai.service.js";
 
 const listPokemonMock = vi.mocked(listPokemon);
 const getPokemonDetailMock = vi.mocked(getPokemonDetail);
 const searchWithEvolutionsMock = vi.mocked(searchWithEvolutions);
+const getPokemonAIDescriptionMock = vi.mocked(getPokemonAIDescription);
 
 describe("pokemon router contracts", () => {
   const caller = appRouter.createCaller({});
@@ -110,5 +117,22 @@ describe("pokemon router contracts", () => {
     expect(result.types).toEqual(PokemonTypeSchema.options);
     expect(result.generations).toEqual(GenerationSchema.options);
   });
-});
 
+  it("aiDescription output conforms to shared schema", async () => {
+    getPokemonAIDescriptionMock.mockResolvedValueOnce({
+      id: 25,
+      name: "pikachu",
+      funFact: "Pikachu stores electricity in its cheeks and discharges when threatened.",
+      provider: "none",
+      model: "none",
+      generatedAt: "2026-02-20T10:00:00.000Z",
+    });
+
+    const result = await caller.pokemon.aiDescription({
+      id: 25,
+      forceRegenerate: false,
+    });
+
+    expect(() => PokemonAIDescriptionOutputSchema.parse(result)).not.toThrow();
+  });
+});

@@ -122,7 +122,7 @@ export function PokemonInlineDetail({
                   aria-label="Pokemon fun fact"
                 >
                   {aiDescriptionQuery.data
-                    ? `${aiDescriptionQuery.data.description} ${aiDescriptionQuery.data.funFact}`
+                    ? aiDescriptionQuery.data.funFact
                     : (aiDescriptionQuery.isLoading
                       ? "Loading AI fun fact..."
                       : "AI fun fact unavailable right now.")}

@@ -15,7 +15,6 @@ const OLLAMA_RESPONSE_SCHEMA = z.object({
 });
 
 const AI_DESCRIPTION_SCHEMA = z.object({
-  description: z.string().min(1).max(800),
   funFact: z.string().min(1).max(300),
 });
 
@@ -43,7 +42,6 @@ function toDisplayGeneration(generation: string): string {
 }
 
 function buildDeterministicFallback(context: AiPokemonContext): {
-  description: string;
   funFact: string;
   provider: string;
   model: string;
@@ -52,11 +50,8 @@ function buildDeterministicFallback(context: AiPokemonContext): {
   const displayGeneration = toDisplayGeneration(context.generation);
 
   return {
-    description: normalizeDescription(
-      `${displayName} is a ${context.types.join("/")} Pokemon from ${displayGeneration}.`,
-    ),
     funFact: normalizeDescription(
-      `${displayName} appears in an evolution chain with ${context.evolutions.length} stage(s).`,
+      `${displayName} is a ${context.types.join("/")} Pokemon from ${displayGeneration} and appears in an evolution chain with ${context.evolutions.length} stage(s).`,
     ),
     provider: "none",
     model: "none",
@@ -72,18 +67,16 @@ function buildPrompt(context: AiPokemonContext): string {
 
   return [
     "You are a concise Pokemon analyst.",
-    "Return ONLY valid JSON with this exact shape: {\"description\":\"...\", \"funFact\":\"...\"}.",
+    "Return ONLY valid JSON with this exact shape: {\"funFact\":\"...\"}.",
     "No markdown, no extra keys, no explanations.",
     `Pokemon: ${context.name} (#${context.id}), ${context.generation}, types=${context.types.join("/")}, top_stats=${topStats}.`,
     `Evolution chain members: ${context.evolutions.join(" -> ")}.`,
     context.variationSeed ? `Variation seed: ${context.variationSeed}. Produce an alternative wording.` : "",
-    "description: exactly 1 short sentence, include one weakness.",
-    "funFact: exactly 1 short trivia sentence, specific to this pokemon/evolution chain.",
+    "funFact: exactly 2 short sentences, first sentence a concise description and second sentence a specific trivia detail tied to this pokemon or its evolution chain.",
   ].join("\n");
 }
 
 export async function generatePokemonDescription(context: AiPokemonContext): Promise<{
-  description: string;
   funFact: string;
   provider: string;
   model: string;
@@ -153,7 +146,6 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
 
     const parsed = AI_DESCRIPTION_SCHEMA.parse(raw);
     return {
-      description: normalizeDescription(parsed.description),
       funFact: normalizeDescription(parsed.funFact),
       provider: "ollama",
       model,
