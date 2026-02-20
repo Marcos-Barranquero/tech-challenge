@@ -123,15 +123,16 @@ export async function searchWithEvolutions(
     .sort((a, b) => a.id - b.id)
     .slice(0, input.limit);
 
+  const chainIds = await Promise.all(
+    matched.map(async (p) => getEvolutionChainIdByPokemonId(p.id)),
+  );
+  const uniqueChainIds = [...new Set(chainIds)];
   const chainMap = new Map<number, number[]>();
 
   await Promise.all(
-    matched.map(async (p) => {
-      const chainId = await getEvolutionChainIdByPokemonId(p.id);
-      if (!chainMap.has(chainId)) {
-        const members = await getEvolutionMemberIds(chainId);
-        chainMap.set(chainId, members);
-      }
+    uniqueChainIds.map(async (chainId) => {
+      const members = await getEvolutionMemberIds(chainId);
+      chainMap.set(chainId, members);
     }),
   );
 
