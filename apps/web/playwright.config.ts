@@ -17,7 +17,8 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter @tech-challenge/api dev",
+      command:
+        "pnpm --filter @tech-challenge/shared build && pnpm --filter @tech-challenge/api dev",
       url: "http://127.0.0.1:4000/health",
       reuseExistingServer: !isCI,
       timeout: 180_000,
@@ -36,4 +37,3 @@ export default defineConfig({
     },
   ],
 });
-
