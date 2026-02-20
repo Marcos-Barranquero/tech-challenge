@@ -130,6 +130,7 @@ describe("pokemon router contracts", () => {
 
     const result = await caller.pokemon.aiDescription({
       id: 25,
+      locale: "en",
       forceRegenerate: false,
     });
 

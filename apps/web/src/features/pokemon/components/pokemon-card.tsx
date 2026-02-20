@@ -4,6 +4,7 @@ import type { PokemonListItem } from "@tech-challenge/shared";
 import Image from "next/image";
 import Link from "next/link";
 import { TYPE_BADGE } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 export function PokemonCard({
   pokemon,
@@ -14,6 +15,8 @@ export function PokemonCard({
   href: string;
   onSelect: (id: number) => void;
 }) {
+  const t = useTranslations("detail");
+
   return (
     <article className="group aspect-square h-full overflow-hidden rounded-md border-[3px] border-[#5b4d91] bg-[#e6e2fa] p-1.5 shadow-[0_4px_0_#4c3d7d,0_10px_18px_rgba(37,30,77,0.22)] transition duration-200 ease-poke hover:-translate-y-0.5">
       <Link
@@ -58,7 +61,7 @@ export function PokemonCard({
 
           <div className="mt-1 flex min-w-0 items-center justify-between gap-1.5">
             <span className="gba-ui-font shrink-0 text-[10px] uppercase text-[#4b4d71] text-left">
-              {pokemon.generation.replace("generation-", "GEN ").toUpperCase()}
+              {pokemon.generation.replace("generation-", `${t("generationShort")} `).toUpperCase()}
             </span>
             <ul className="flex min-w-0 flex-wrap justify-end gap-1" aria-label="Pokemon types">
               {pokemon.types.map((type) => (

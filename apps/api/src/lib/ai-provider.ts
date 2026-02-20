@@ -1,9 +1,11 @@
 import { z } from "zod";
+import type { SupportedLocale } from "@tech-challenge/shared";
 
 type AiPokemonContext = {
   id: number;
   name: string;
   generation: string;
+  locale: SupportedLocale;
   types: string[];
   stats: Array<{ name: string; value: number }>;
   evolutions: string[];
@@ -48,11 +50,18 @@ function buildDeterministicFallback(context: AiPokemonContext): {
 } {
   const displayName = toDisplayName(context.name);
   const displayGeneration = toDisplayGeneration(context.generation);
+  const typeNames = context.types.join("/");
+
+  const fallbackByLocale: Record<SupportedLocale, string> = {
+    en: `${displayName} is a ${typeNames} Pokemon from ${displayGeneration} and appears in an evolution chain with ${context.evolutions.length} stage(s).`,
+    es: `${displayName} es un Pokemon de tipo ${typeNames} de ${displayGeneration} y aparece en una cadena evolutiva con ${context.evolutions.length} etapa(s).`,
+    it: `${displayName} e un Pokemon di tipo ${typeNames} della ${displayGeneration} e compare in una catena evolutiva con ${context.evolutions.length} fase(i).`,
+    pt: `${displayName} e um Pokemon do tipo ${typeNames} da ${displayGeneration} e aparece em uma linha evolutiva com ${context.evolutions.length} estagio(s).`,
+    de: `${displayName} ist ein Pokemon vom Typ ${typeNames} aus ${displayGeneration} und erscheint in einer Entwicklungskette mit ${context.evolutions.length} Stufe(n).`,
+  };
 
   return {
-    funFact: normalizeDescription(
-      `${displayName} is a ${context.types.join("/")} Pokemon from ${displayGeneration} and appears in an evolution chain with ${context.evolutions.length} stage(s).`,
-    ),
+    funFact: normalizeDescription(fallbackByLocale[context.locale]),
     provider: "none",
     model: "none",
   };
@@ -65,10 +74,19 @@ function buildPrompt(context: AiPokemonContext): string {
     .map((s) => `${s.name}:${s.value}`)
     .join(", ");
 
+  const languageByLocale: Record<SupportedLocale, string> = {
+    en: "English",
+    es: "Spanish",
+    it: "Italian",
+    pt: "Portuguese",
+    de: "German",
+  };
+
   return [
     "You are a concise Pokemon analyst.",
     "Return ONLY valid JSON with this exact shape: {\"funFact\":\"...\"}.",
     "No markdown, no extra keys, no explanations.",
+    `Write the funFact in ${languageByLocale[context.locale]}.`,
     `Pokemon: ${context.name} (#${context.id}), ${context.generation}, types=${context.types.join("/")}, top_stats=${topStats}.`,
     `Evolution chain members: ${context.evolutions.join(" -> ")}.`,
     context.variationSeed ? `Variation seed: ${context.variationSeed}. Produce an alternative wording.` : "",

@@ -8,6 +8,8 @@ import { TYPE_BADGE } from "@/lib/constants";
 import { ChevronLeft } from "lucide-react";
 import type { PokemonType } from "@tech-challenge/shared";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useLocaleStore } from "@/stores/locale.store";
 
 export function PokemonInlineDetail({
   id,
@@ -22,7 +24,9 @@ export function PokemonInlineDetail({
 }) {
   const { data, isLoading } = usePokemonDetail(id);
   const [regenerationNonce, setRegenerationNonce] = useState(0);
-  const aiDescriptionQuery = usePokemonAiDescription(id, regenerationNonce);
+  const locale = useLocaleStore((state) => state.locale);
+  const aiDescriptionQuery = usePokemonAiDescription(id, locale, regenerationNonce);
+  const t = useTranslations("detail");
   const previousIdRef = useRef<number | null>(null);
   const pendingDirectionRef = useRef<"up" | "down" | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<"up" | "down" | null>(null);
@@ -88,10 +92,10 @@ export function PokemonInlineDetail({
         className="gba-ui-font inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-[#5a4d8f] bg-[#ece8ff] px-3.5 py-2 text-[15px] text-[#312e81] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
       >
         <ChevronLeft aria-hidden="true" className="size-5" />
-        Back
+        {t("back")}
       </button>
 
-      <div className="mt-3 grid h-[calc(100%-56px)] grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="mt-3 grid h-[calc(100%-56px)] grid-cols-1 gap-3 md:grid-cols-4">
         <div className="flex min-h-0 flex-col rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3">
           <div className="relative min-h-0 flex-1">
             <Image src={data.image} alt={`${data.name} artwork`} fill sizes="220px" className="object-contain p-2" priority />
@@ -99,7 +103,7 @@ export function PokemonInlineDetail({
           <div className="mt-2">
             <p className="gba-ui-font text-[12px] uppercase text-[#4c3f7d]">#{data.id.toString().padStart(4, "0")}</p>
             <h2 className="gba-ui-font truncate text-3xl capitalize text-[#1f2033]">{data.name}</h2>
-            <p className="gba-ui-font text-[12px] text-[#4b4d71]">{data.generation.replace("generation-", "Gen ").toUpperCase()}</p>
+            <p className="gba-ui-font text-[12px] text-[#4b4d71]">{data.generation.replace("generation-", `${t("generationShort")} `).toUpperCase()}</p>
 
             <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Pokemon types">
               {data.types.map((type: PokemonType) => (
@@ -111,10 +115,10 @@ export function PokemonInlineDetail({
           </div>
         </div>
 
-        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3">
+        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3 md:col-span-2">
           <div className="flex h-full min-h-0 flex-col gap-2">
             <section className="h-1/2 min-h-0 rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2.5">
-              <h3 className="gba-ui-font text-[18px] uppercase text-[#1f2033]">Fun Fact</h3>
+              <h3 className="gba-ui-font text-[18px] uppercase text-[#1f2033]">{t("funFact")}</h3>
               <div className="mt-2 flex h-[calc(100%-30px)] min-h-0 flex-col pb-1">
                 <p
                   className="min-h-0 flex-1 overflow-y-auto pr-1 text-[14px] leading-snug text-[#2e3253]"
@@ -124,8 +128,8 @@ export function PokemonInlineDetail({
                   {aiDescriptionQuery.data
                     ? aiDescriptionQuery.data.funFact
                     : (aiDescriptionQuery.isLoading
-                      ? "Loading AI fun fact..."
-                      : "AI fun fact unavailable right now.")}
+                      ? t("loadingFunFact")
+                      : t("unavailableFunFact"))}
                 </p>
                 <button
                   type="button"
@@ -133,13 +137,13 @@ export function PokemonInlineDetail({
                   disabled={aiDescriptionQuery.isLoading}
                   className="gba-ui-font mt-2 mb-1 inline-flex w-fit items-center justify-center rounded-md border-2 border-[#5a4d8f] bg-[#ece8ff] px-3.5 py-2 text-[15px] text-[#312e81] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {aiDescriptionQuery.isLoading ? "Generating..." : "Another"}
+                  {aiDescriptionQuery.isLoading ? t("generating") : t("another")}
                 </button>
               </div>
             </section>
 
             <section className="h-1/2 min-h-0 rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2.5">
-              <h3 className="gba-ui-font text-[16px] uppercase text-[#1f2033]">Stats</h3>
+              <h3 className="gba-ui-font text-[16px] uppercase text-[#1f2033]">{t("stats")}</h3>
               <ul className="mt-2 flex h-[calc(100%-28px)] flex-col justify-between">
                 {data.stats.map((stat) => (
                   <li key={stat.name} className="grid min-h-0 grid-cols-[108px_1fr_42px] items-center gap-2">
@@ -156,7 +160,7 @@ export function PokemonInlineDetail({
         </div>
 
         <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3">
-          <h3 className="gba-ui-font text-[22px] uppercase text-[#1f2033]">Evolutions</h3>
+          <h3 className="gba-ui-font text-[22px] uppercase text-[#1f2033]">{t("evolutions")}</h3>
           <ul className="mt-3 flex h-[calc(100%-36px)] flex-col gap-2 overflow-y-auto pr-1">
             {data.evolutions.map((evo) => (
               <li key={evo.id}>
@@ -191,10 +195,10 @@ export function PokemonInlineDetail({
                       : "border-[#8479b8] bg-[#fdfdff] hover:-translate-y-0.5"
                   }`}
                 >
-                  <div className="relative h-14 w-14 shrink-0">
+                  <div className="relative h-12 w-12 shrink-0">
                     <Image src={evo.image} alt={`${evo.name} artwork`} fill sizes="44px" className="object-contain" />
                   </div>
-                  <p className="gba-ui-font truncate text-[22px] capitalize text-[#1f2033]">{evo.name}</p>
+                  <p className="gba-ui-font truncate text-[19px] capitalize text-[#1f2033]">{evo.name}</p>
                 </Link>
               </li>
             ))}

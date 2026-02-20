@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.5] - 2026-02-20
+
+### Added
+
+- Internationalization support across the frontend with five locales:
+  - English (`en`),
+  - Spanish (`es`),
+  - Italian (`it`),
+  - Portuguese (`pt`),
+  - German (`de`).
+- New language switcher UI with flag + locale code buttons.
+- Locale persistence in client state via Zustand.
+- Locale-aware AI fun-fact generation in the BFF:
+  - `locale` added to the shared `pokemon.aiDescription` input contract,
+  - locale-specific cache keys,
+  - locale-specific fallback fun-fact copy.
+- Extended test coverage for i18n and AI locale behavior:
+  - backend tests for AI provider and AI service locale handling,
+  - frontend tests for language switcher and locale store,
+  - E2E scenario validating runtime language switch to Spanish.
+
+### Changed
+
+- Detail layout redistributed to a horizontal 4-block composition on desktop:
+  - image/name panel (1 column),
+  - fun-fact + stats panel (2 columns),
+  - evolutions panel (1 smaller column).
+- Language switcher moved below the console shell to avoid overlaying the GBA screen.
+- Replaced French locale option with German in both UI and backend locale mappings.
+
+### Fixed
+
+- Docker build compatibility in OrbStack and similar environments:
+  - switched Docker base/runtime images from `node:25-alpine` to `node:22-alpine`,
+  - installed and activated Corepack/Pnpm explicitly in Docker build stages to avoid `corepack: not found`.
+
 ## [0.0.4] - 2026-02-20
 
 ### Added

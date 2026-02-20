@@ -86,7 +86,7 @@ describe("pokemon router", () => {
       generatedAt: "2026-02-20T10:00:00.000Z",
     });
 
-    const result = await caller.pokemon.aiDescription({ id: 25, forceRegenerate: false });
+    const result = await caller.pokemon.aiDescription({ id: 25, locale: "en", forceRegenerate: false });
 
     expect(result.funFact).toContain("Pikachu");
     expect(result.provider).toBe("none");
@@ -95,7 +95,7 @@ describe("pokemon router", () => {
   it("maps AiProviderError to BAD_GATEWAY on aiDescription", async () => {
     getPokemonAIDescriptionMock.mockRejectedValueOnce(new AiProviderError("timeout", 408));
 
-    await expect(caller.pokemon.aiDescription({ id: 25, forceRegenerate: false })).rejects.toMatchObject({
+    await expect(caller.pokemon.aiDescription({ id: 25, locale: "en", forceRegenerate: false })).rejects.toMatchObject({
       code: "BAD_GATEWAY",
       message: "AI provider is unavailable",
     });
