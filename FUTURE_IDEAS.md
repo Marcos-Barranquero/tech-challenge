@@ -31,3 +31,17 @@
 - Include architecture trade-offs taken under time constraints and what to improve first.
 - Document UX decisions that worked well vs. decisions that created friction.
 - Outline a phased improvement plan (performance, maintainability, accessibility, testing).
+
+## 5. Add Public Deployment Flow for Latest Release
+
+- Add a release-driven GitHub Pages deployment for the frontend, always publishing the latest release tag.
+- Deploy the BFF API to a managed platform and wire production `NEXT_PUBLIC_API_URL`.
+- Add CORS and environment hardening for the public Pages domain.
+- Document a zero-cost deployment path (free tiers, no custom domain) for quick demos.
+
+## 6. Extend Local LLM Runtime Integration
+
+- Expand AI insight features using an external local LLM runtime (Ollama host service).
+- Implement a provider abstraction (`cloud` vs `local`) to keep business logic provider-agnostic.
+- Validate model outputs with strict Zod schemas and cache AI responses aggressively.
+- Benchmark latency and memory footprint on Apple Silicon (16 GB baseline) and tune model size.

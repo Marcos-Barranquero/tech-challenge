@@ -61,6 +61,17 @@ Current documented release: `0.0.2`
 
 ## Run Locally
 
+### One-command helper script
+
+```bash
+./scripts/pokedex-stack.sh up --ai host --model qwen2:0.5b
+./scripts/pokedex-stack.sh down --ai host
+```
+
+Modes:
+- `--ai host`: Ollama on host (best performance on Apple Silicon with Metal), web+api in Docker.
+- `--ai none`: disables AI generation and uses deterministic fallback.
+
 ### With Docker (recommended)
 
 ```bash
