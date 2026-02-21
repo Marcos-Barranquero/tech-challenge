@@ -4,6 +4,13 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
   en: {
     common: {
       languageSelector: "Language selector",
+      shellColorSelector: "Shell color selector",
+      theme: {
+        purple: "Purple shell",
+        red: "Red shell",
+        yellow: "Yellow shell",
+        blue: "Blue shell",
+      },
     },
     search: {
       label: "Search Pokemon and evolutions",
@@ -35,6 +42,13 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
   es: {
     common: {
       languageSelector: "Selector de idioma",
+      shellColorSelector: "Selector de color de carcasa",
+      theme: {
+        purple: "Carcasa morada",
+        red: "Carcasa roja",
+        yellow: "Carcasa amarilla",
+        blue: "Carcasa azul",
+      },
     },
     search: {
       label: "Buscar Pokemon y evoluciones",
@@ -66,6 +80,13 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
   it: {
     common: {
       languageSelector: "Selettore lingua",
+      shellColorSelector: "Selettore colore scocca",
+      theme: {
+        purple: "Scocca viola",
+        red: "Scocca rossa",
+        yellow: "Scocca gialla",
+        blue: "Scocca blu",
+      },
     },
     search: {
       label: "Cerca Pokemon ed evoluzioni",
@@ -97,6 +118,13 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
   pt: {
     common: {
       languageSelector: "Seletor de idioma",
+      shellColorSelector: "Seletor de cor da carcaça",
+      theme: {
+        purple: "Carcaça roxa",
+        red: "Carcaça vermelha",
+        yellow: "Carcaça amarela",
+        blue: "Carcaça azul",
+      },
     },
     search: {
       label: "Buscar Pokemon e evolucoes",
@@ -128,6 +156,13 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
   de: {
     common: {
       languageSelector: "Sprachauswahl",
+      shellColorSelector: "Gehausefarbwahl",
+      theme: {
+        purple: "Lila Gehause",
+        red: "Rotes Gehause",
+        yellow: "Gelbes Gehause",
+        blue: "Blaues Gehause",
+      },
     },
     search: {
       label: "Pokemon und Entwicklungen suchen",

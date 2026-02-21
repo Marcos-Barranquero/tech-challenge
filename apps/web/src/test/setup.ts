@@ -36,6 +36,11 @@ vi.mock("next/link", () => ({
 const EN_MESSAGES: Record<string, Record<string, string>> = {
   common: {
     languageSelector: "Language selector",
+    shellColorSelector: "Shell color selector",
+    "theme.purple": "Purple shell",
+    "theme.red": "Red shell",
+    "theme.yellow": "Yellow shell",
+    "theme.blue": "Blue shell",
   },
   search: {
     label: "Search Pokemon and evolutions",
