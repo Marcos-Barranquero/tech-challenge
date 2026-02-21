@@ -58,6 +58,8 @@ export function PokemonExplorer() {
 
   const listPanelRef = useRef<HTMLDivElement | null>(null);
   const [gridStyle, setGridStyle] = useState<CSSProperties>({});
+  const [gridCols, setGridCols] = useState(6);
+  const gridRows = 2;
 
   useEffect(() => {
     if (isDetailView) {
@@ -94,25 +96,24 @@ export function PokemonExplorer() {
       return;
     }
 
-    const rows = 2;
-
     const compute = () => {
       const viewportWidth = window.innerWidth;
       const isMobile = viewportWidth <= 768;
       const isTablet = viewportWidth <= 1200 && !isMobile;
       const cols = isMobile ? 2 : isTablet ? 3 : 6;
       const gap = isMobile ? 8 : 10;
-      const insetInline = isMobile ? 4 : isTablet ? 6 : 8;
-      const insetBlock = isMobile ? 4 : isTablet ? 6 : 8;
+      const insetInline = isMobile ? 14 : isTablet ? 16 : 18;
+      const insetBlock = isMobile ? 12 : isTablet ? 14 : 16;
       const width = node.clientWidth;
       const height = node.clientHeight;
       const availableWidth = Math.max(0, width - insetInline * 2 - gap * (cols - 1));
-      const availableHeight = Math.max(0, height - insetBlock * 2 - gap * (rows - 1));
-      const tile = Math.max(56, Math.floor(Math.min(availableWidth / cols, availableHeight / rows)));
+      const availableHeight = Math.max(0, height - insetBlock * 2 - gap * (gridRows - 1));
+      const tile = Math.max(56, Math.floor(Math.min(availableWidth / cols, availableHeight / gridRows)));
 
+      setGridCols(cols);
       setGridStyle({
         ["--grid-cols" as string]: String(cols),
-        ["--grid-rows" as string]: String(rows),
+        ["--grid-rows" as string]: String(gridRows),
         ["--grid-gap" as string]: `${gap}px`,
         ["--grid-inset-inline" as string]: `${insetInline}px`,
         ["--grid-inset-block" as string]: `${insetBlock}px`,
@@ -126,6 +127,15 @@ export function PokemonExplorer() {
 
     return () => observer.disconnect();
   }, []);
+
+  const cardsPerPage = gridCols * gridRows;
+  const pagedItems = useMemo(() => {
+    const pages: Array<typeof items> = [];
+    for (let index = 0; index < items.length; index += cardsPerPage) {
+      pages.push(items.slice(index, index + cardsPerPage));
+    }
+    return pages;
+  }, [cardsPerPage, items]);
 
   return (
     <main
@@ -153,18 +163,30 @@ export function PokemonExplorer() {
 
                   {!isInitialLoading && items.length > 0 && (
                     <>
-                      <div className="screen-grid">
-                        {items.map((pokemon) => (
-                          <div key={pokemon.id} className="slot-item">
-                            <PokemonCard
-                              pokemon={pokemon}
-                              href={getPokemonHref(pokemon.id)}
-                              onSelect={openPokemon}
-                            />
-                          </div>
+                      <div className="screen-pages">
+                        {pagedItems.map((page, pageIndex) => (
+                          <section key={`page-${pageIndex}`} className="screen-page">
+                            <div className="screen-grid">
+                              {Array.from({ length: cardsPerPage }).map((_, cellIndex) => {
+                                const pokemon = page[cellIndex];
+                                if (!pokemon) {
+                                  return <div key={`placeholder-${pageIndex}-${cellIndex}`} className="slot-placeholder" aria-hidden="true" />;
+                                }
+                                return (
+                                  <div key={pokemon.id} className="slot-item">
+                                    <PokemonCard
+                                      pokemon={pokemon}
+                                      href={getPokemonHref(pokemon.id)}
+                                      onSelect={openPokemon}
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </section>
                         ))}
                       </div>
-                      <div className="h-8" aria-hidden="true" />
+                      <div className="h-2" aria-hidden="true" />
                       {isFetchingNextPage && (
                         <p className="gba-ui-font pb-2 text-center text-[12px] text-[#3d336b]">
                           Loading more Pokemon...
