@@ -78,7 +78,7 @@ export function PokemonInlineDetail({
   return (
     <section
       key={transitionKey}
-      className={`h-full rounded-lg border-2 border-[#5f518f] bg-[#f4f1ff]/95 p-3 shadow-[0_5px_0_#4e3f82,0_12px_22px_rgba(37,30,77,0.2)] md:p-4 ${
+      className={`h-auto min-h-full rounded-lg border-2 border-[#5f518f] bg-[#f4f1ff]/95 p-2 shadow-[0_5px_0_#4e3f82,0_12px_22px_rgba(37,30,77,0.2)] sm:p-3 md:p-4 lg:h-full ${
         transitionDirection === "up"
           ? "detail-reel-up"
           : transitionDirection === "down"
@@ -89,25 +89,41 @@ export function PokemonInlineDetail({
       <button
         type="button"
         onClick={onBack}
-        className="gba-ui-font inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-[#5a4d8f] bg-[#ece8ff] px-3.5 py-2 text-[15px] text-[#312e81] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
+        className="gba-ui-font inline-flex cursor-pointer items-center gap-1 rounded-md border-2 border-[#5a4d8f] bg-[#ece8ff] px-2.5 py-1.5 text-[12px] text-[#312e81] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] sm:gap-1.5 sm:px-3 sm:py-2 sm:text-[13px] md:px-3.5 md:text-[15px]"
       >
-        <ChevronLeft aria-hidden="true" className="size-5" />
+        <ChevronLeft aria-hidden="true" className="size-4 sm:size-5" />
         {t("back")}
       </button>
 
-      <div className="mt-3 grid h-[calc(100%-56px)] grid-cols-1 gap-3 md:grid-cols-4">
-        <div className="flex min-h-0 flex-col rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3">
-          <div className="relative min-h-0 flex-1">
-            <Image src={data.image} alt={`${data.name} artwork`} fill sizes="220px" className="object-contain p-2" priority />
+      <div className="mt-2 grid grid-cols-1 gap-2 sm:mt-3 sm:gap-3 md:grid-cols-2 lg:h-[calc(100%-56px)] lg:grid-cols-4">
+        <div className="flex min-h-0 flex-col rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1">
+          <div className="relative h-36 sm:h-44 md:h-52 lg:min-h-0 lg:flex-1">
+            <Image
+              src={data.image}
+              alt={`${data.name} artwork`}
+              fill
+              sizes="(max-width: 767px) 200px, (max-width: 1023px) 260px, 220px"
+              className="object-contain p-1.5 sm:p-2"
+              priority
+            />
           </div>
-          <div className="mt-2">
-            <p className="gba-ui-font text-[12px] uppercase text-[#4c3f7d]">#{data.id.toString().padStart(4, "0")}</p>
-            <h2 className="gba-ui-font truncate text-3xl capitalize text-[#1f2033]">{data.name}</h2>
-            <p className="gba-ui-font text-[12px] text-[#4b4d71]">{data.generation.replace("generation-", `${t("generationShort")} `).toUpperCase()}</p>
+          <div className="mt-1.5 sm:mt-2">
+            <p className="gba-ui-font text-[10px] uppercase text-[#4c3f7d] sm:text-[11px] md:text-[12px]">
+              #{data.id.toString().padStart(4, "0")}
+            </p>
+            <h2 className="gba-ui-font truncate text-[21px] capitalize text-[#1f2033] sm:text-[25px] md:text-[30px]">
+              {data.name}
+            </h2>
+            <p className="gba-ui-font text-[10px] text-[#4b4d71] sm:text-[11px] md:text-[12px]">
+              {data.generation.replace("generation-", `${t("generationShort")} `).toUpperCase()}
+            </p>
 
-            <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Pokemon types">
+            <ul className="mt-1.5 flex flex-wrap gap-1 sm:gap-1.5" aria-label="Pokemon types">
               {data.types.map((type: PokemonType) => (
-                <li key={type} className={`gba-ui-font rounded-sm border px-2 py-1 text-[11px] uppercase ${TYPE_BADGE[type]}`}>
+                <li
+                  key={type}
+                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[9px] uppercase sm:px-2 sm:py-1 sm:text-[10px] md:text-[11px] ${TYPE_BADGE[type]}`}
+                >
                   {type}
                 </li>
               ))}
@@ -115,13 +131,15 @@ export function PokemonInlineDetail({
           </div>
         </div>
 
-        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3 md:col-span-2">
-          <div className="flex h-full min-h-0 flex-col gap-2">
-            <section className="h-1/2 min-h-0 rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2.5">
-              <h3 className="gba-ui-font text-[18px] uppercase text-[#1f2033]">{t("funFact")}</h3>
-              <div className="mt-2 flex h-[calc(100%-30px)] min-h-0 flex-col pb-1">
+        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-2">
+          <div className="grid min-h-0 grid-rows-[auto_auto] gap-2 sm:gap-3 md:h-[420px] md:grid-rows-2 lg:h-full">
+            <section className="min-h-[150px] rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[170px] sm:p-2.5 md:h-full md:min-h-0">
+              <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
+                {t("funFact")}
+              </h3>
+              <div className="mt-2 flex h-[calc(100%-24px)] min-h-0 flex-col pb-1 sm:h-[calc(100%-28px)]">
                 <p
-                  className="min-h-0 flex-1 overflow-y-auto pr-1 text-[14px] leading-snug text-[#2e3253]"
+                  className="min-h-0 flex-1 overflow-y-auto pr-1 text-[12px] leading-snug text-[#2e3253] sm:text-[13px] md:text-[14px]"
                   tabIndex={0}
                   aria-label="Pokemon fun fact"
                 >
@@ -135,23 +153,32 @@ export function PokemonInlineDetail({
                   type="button"
                   onClick={() => setRegenerationNonce((value) => value + 1)}
                   disabled={aiDescriptionQuery.isLoading}
-                  className="gba-ui-font mt-2 mb-1 inline-flex w-fit items-center justify-center rounded-md border-2 border-[#5a4d8f] bg-[#ece8ff] px-3.5 py-2 text-[15px] text-[#312e81] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="gba-ui-font mt-2 mb-1 inline-flex w-fit items-center justify-center rounded-md border-2 border-[#5a4d8f] bg-[#ece8ff] px-2.5 py-1.5 text-[12px] text-[#312e81] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:py-2 sm:text-[13px] md:px-3.5 md:text-[15px]"
                 >
                   {aiDescriptionQuery.isLoading ? t("generating") : t("another")}
                 </button>
               </div>
             </section>
 
-            <section className="h-1/2 min-h-0 rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2.5">
-              <h3 className="gba-ui-font text-[16px] uppercase text-[#1f2033]">{t("stats")}</h3>
-              <ul className="mt-2 flex h-[calc(100%-28px)] flex-col justify-between">
+            <section className="min-h-[170px] rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[190px] sm:p-2.5 md:h-full md:min-h-0">
+              <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
+                {t("stats")}
+              </h3>
+              <ul className="mt-2 flex h-[calc(100%-24px)] flex-col justify-between sm:h-[calc(100%-28px)]">
                 {data.stats.map((stat) => (
-                  <li key={stat.name} className="grid min-h-0 grid-cols-[108px_1fr_42px] items-center gap-2">
-                    <span className="gba-ui-font text-[9px] uppercase leading-tight text-[#4b4d71]">{stat.name}</span>
-                    <div className="h-3 overflow-hidden rounded-sm border border-[#8a7fc1] bg-[#e4e1f8]">
+                  <li
+                    key={stat.name}
+                    className="grid min-h-0 grid-cols-[74px_1fr_28px] items-center gap-1.5 sm:grid-cols-[90px_1fr_34px] sm:gap-2 md:grid-cols-[108px_1fr_42px]"
+                  >
+                    <span className="gba-ui-font text-[7px] uppercase leading-tight text-[#4b4d71] sm:text-[8px] md:text-[9px]">
+                      {stat.name}
+                    </span>
+                    <div className="h-2.5 overflow-hidden rounded-sm border border-[#8a7fc1] bg-[#e4e1f8] sm:h-3">
                       <div className="h-full rounded-none bg-gradient-to-r from-[#5b4d91] to-[#7c6ac4]" style={{ width: `${Math.min(100, stat.value)}%` }} />
                     </div>
-                    <span className="gba-ui-font text-right text-[10px] text-[#1f2033]">{stat.value}</span>
+                    <span className="gba-ui-font text-right text-[8px] text-[#1f2033] sm:text-[9px] md:text-[10px]">
+                      {stat.value}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -159,9 +186,11 @@ export function PokemonInlineDetail({
           </div>
         </div>
 
-        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-3">
-          <h3 className="gba-ui-font text-[22px] uppercase text-[#1f2033]">{t("evolutions")}</h3>
-          <ul className="mt-3 flex h-[calc(100%-36px)] flex-col gap-2 overflow-y-auto pr-1">
+        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1">
+          <h3 className="gba-ui-font text-[15px] uppercase text-[#1f2033] sm:text-[18px] md:text-[20px] lg:text-[22px]">
+            {t("evolutions")}
+          </h3>
+          <ul className="mt-2 flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 sm:mt-3 sm:max-h-[280px] md:max-h-[340px] lg:h-[calc(100%-36px)] lg:max-h-none">
             {data.evolutions.map((evo) => (
               <li key={evo.id}>
                 <Link
@@ -189,16 +218,18 @@ export function PokemonInlineDetail({
                     onSelectEvolution(evo.id);
                   }}
                   aria-current={evo.isCurrent ? "page" : undefined}
-                  className={`flex w-full cursor-pointer items-center gap-3 rounded-md border-2 p-2 text-left transition duration-200 ease-poke focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] ${
+                  className={`flex w-full cursor-pointer items-center gap-2 rounded-md border-2 p-1.5 text-left transition duration-200 ease-poke focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] sm:gap-3 sm:p-2 ${
                     evo.isCurrent
                       ? "border-[#4f46e5] bg-[#ede9fe]"
                       : "border-[#8479b8] bg-[#fdfdff] hover:-translate-y-0.5"
                   }`}
                 >
-                  <div className="relative h-12 w-12 shrink-0">
+                  <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12">
                     <Image src={evo.image} alt={`${evo.name} artwork`} fill sizes="44px" className="object-contain" />
                   </div>
-                  <p className="gba-ui-font truncate text-[19px] capitalize text-[#1f2033]">{evo.name}</p>
+                  <p className="gba-ui-font truncate text-[14px] capitalize text-[#1f2033] sm:text-[16px] md:text-[19px]">
+                    {evo.name}
+                  </p>
                 </Link>
               </li>
             ))}

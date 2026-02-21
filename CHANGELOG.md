@@ -5,6 +5,52 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.7] - 2026-02-21
+
+### Added
+
+- Pokeball favicon integration for browser tabs (`/pokeball-favicon.svg`) wired through Next.js metadata icons.
+
+### Changed
+
+- Responsive system refactor to a clearer mobile-first 3-tier model:
+  - mobile (`<= 768px`),
+  - tablet (`769px - 1200px`),
+  - desktop (`> 1200px`).
+- Detail screen layout rebuilt for responsive stability:
+  - improved stacking/column behavior between mobile, tablet, and desktop,
+  - better typography scaling for cards, filters, search, and detail content,
+  - improved panel sizing and spacing in constrained viewports.
+- Console sizing behavior in mobile tuned to keep a stable width envelope while preserving side margins.
+
+### Fixed
+
+- Removed layout shifts in detail view when AI fun-fact content arrives (desktop and tablet).
+- Fixed tablet detail container clipping/early visual cutoff by allowing the detail container to grow with scroll content.
+- Fixed inconsistent intermediate mobile/tablet card density by keeping the small-screen grid at 2 columns.
+
+## [0.0.6] - 2026-02-21
+
+### Added
+
+- GBA shell color customization with four themes:
+  - purple (default),
+  - red,
+  - yellow,
+  - blue.
+- Dedicated shell color picker component integrated in the console frame.
+- New persisted Zustand store for shell theme selection (`localStorage`).
+- UI and state test coverage for theme switching and persistence:
+  - store unit tests,
+  - theme picker component tests,
+  - E2E persistence test across page reload.
+
+### Changed
+
+- Global visual direction updated with a dark page background and theme-driven shell variables.
+- Console controls resized and repositioned for better symmetry and to avoid overlap with the color picker.
+- Mobile behavior updated so bottom console controls are hidden when side columns collapse, keeping only core branding.
+
 ## [0.0.5] - 2026-02-20
 
 ### Added

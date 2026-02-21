@@ -96,7 +96,7 @@ export function PokemonExplorer() {
           <div className="gba-screen">
             {!isDetailView && (
               <div className="screen-sticky">
-                <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-2">
+                <div className="grid grid-cols-1 items-center gap-2 lg:grid-cols-2">
                   <PokemonSearch />
                   <PokemonFilters />
                 </div>
