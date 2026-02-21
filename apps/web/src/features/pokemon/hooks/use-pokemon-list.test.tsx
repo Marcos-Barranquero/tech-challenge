@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePokemonFiltersStore } from "@/stores/pokemon-filters.store";
 
 const listUseQueryMock = vi.fn();
+const listInfiniteUseQueryMock = vi.fn();
 const searchUseQueryMock = vi.fn();
 const toastErrorMock = vi.fn();
 
@@ -13,6 +14,9 @@ vi.mock("@/lib/trpc", () => ({
     pokemon: {
       list: {
         useQuery: (...args: unknown[]) => listUseQueryMock(...args),
+      },
+      listInfinite: {
+        useInfiniteQuery: (...args: unknown[]) => listInfiniteUseQueryMock(...args),
       },
       searchWithEvolutions: {
         useQuery: (...args: unknown[]) => searchUseQueryMock(...args),
@@ -36,36 +40,42 @@ describe("usePokemonList", () => {
   });
 
   it("uses list query when search is empty", () => {
-    listUseQueryMock.mockReturnValue({
+    listInfiniteUseQueryMock.mockReturnValue({
       data: {
-        items: [
+        pages: [
           {
-            id: 4,
-            name: "charmander",
-            generation: "generation-i",
-            types: ["fire"],
-            image: "https://img/charmander.png",
+            items: [
+              {
+                id: 4,
+                name: "charmander",
+                generation: "generation-i",
+                types: ["fire"],
+                image: "https://img/charmander.png",
+              },
+            ],
+            total: 1,
+            page: 1,
+            pageSize: 60,
+            hasNextPage: false,
+            nextCursor: null,
           },
         ],
-        total: 1,
       },
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
       isError: false,
       error: null,
     });
-    searchUseQueryMock.mockReturnValue({
-      data: { groups: [] },
-      isLoading: false,
-      isFetching: false,
-      isError: false,
-      error: null,
-    });
+    listUseQueryMock.mockReturnValue({});
+    searchUseQueryMock.mockReturnValue({ data: { groups: [] }, isLoading: false, isFetching: false, isError: false, error: null });
 
     const { result } = renderHook(() => usePokemonList());
 
-    expect(listUseQueryMock).toHaveBeenCalledWith(
-      expect.objectContaining({ search: "" }),
+    expect(listInfiniteUseQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ search: "", limit: 60 }),
       expect.objectContaining({ enabled: true }),
     );
     expect(searchUseQueryMock).toHaveBeenCalledWith(
@@ -81,13 +91,17 @@ describe("usePokemonList", () => {
     store.setSearch("chu");
     store.setType("electric");
 
-    listUseQueryMock.mockReturnValue({
-      data: { items: [], total: 0 },
+    listInfiniteUseQueryMock.mockReturnValue({
+      data: { pages: [] },
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
       isError: false,
       error: null,
     });
+    listUseQueryMock.mockReturnValue({});
     searchUseQueryMock.mockReturnValue({
       data: {
         groups: [
@@ -146,7 +160,7 @@ describe("usePokemonList", () => {
 
     const { result } = renderHook(() => usePokemonList());
 
-    expect(listUseQueryMock).toHaveBeenCalledWith(
+    expect(listInfiniteUseQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({ search: "chu" }),
       expect.objectContaining({ enabled: false }),
     );
@@ -159,13 +173,17 @@ describe("usePokemonList", () => {
   });
 
   it("emits toast error when either query fails", () => {
-    listUseQueryMock.mockReturnValue({
-      data: { items: [], total: 0 },
+    listInfiniteUseQueryMock.mockReturnValue({
+      data: { pages: [] },
       isLoading: false,
       isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
       isError: true,
       error: new Error("List failed"),
     });
+    listUseQueryMock.mockReturnValue({});
     searchUseQueryMock.mockReturnValue({
       data: { groups: [] },
       isLoading: false,
@@ -178,5 +196,50 @@ describe("usePokemonList", () => {
 
     expect(toastErrorMock).toHaveBeenCalledWith("List failed");
   });
-});
 
+  it("loads next page when list has more results", () => {
+    const fetchNextPageMock = vi.fn();
+    listInfiniteUseQueryMock.mockReturnValue({
+      data: {
+        pages: [
+          {
+            items: [
+              {
+                id: 1,
+                name: "bulbasaur",
+                generation: "generation-i",
+                types: ["grass"],
+                image: "https://img/bulbasaur.png",
+              },
+            ],
+            total: 2,
+            page: 1,
+            pageSize: 60,
+            hasNextPage: true,
+            nextCursor: 2,
+          },
+        ],
+      },
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: true,
+      fetchNextPage: fetchNextPageMock,
+      isError: false,
+      error: null,
+    });
+    listUseQueryMock.mockReturnValue({});
+    searchUseQueryMock.mockReturnValue({
+      data: { groups: [] },
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+      error: null,
+    });
+
+    const { result } = renderHook(() => usePokemonList());
+    result.current.loadMore();
+
+    expect(fetchNextPageMock).toHaveBeenCalledTimes(1);
+  });
+});

@@ -1,4 +1,5 @@
 import {
+  ListPokemonInfiniteOutputSchema,
   ListPokemonOutputSchema,
   PokemonDetailOutputSchema,
   PokemonTypeSchema,
@@ -11,6 +12,7 @@ import { appRouter } from "./index.js";
 
 vi.mock("../services/pokemon.service.js", () => ({
   listPokemon: vi.fn(),
+  listPokemonInfinite: vi.fn(),
   getPokemonDetail: vi.fn(),
   searchWithEvolutions: vi.fn(),
 }));
@@ -21,12 +23,14 @@ vi.mock("../services/pokemon-ai.service.js", () => ({
 
 import {
   getPokemonDetail,
+  listPokemonInfinite,
   listPokemon,
   searchWithEvolutions,
 } from "../services/pokemon.service.js";
 import { getPokemonAIDescription } from "../services/pokemon-ai.service.js";
 
 const listPokemonMock = vi.mocked(listPokemon);
+const listPokemonInfiniteMock = vi.mocked(listPokemonInfinite);
 const getPokemonDetailMock = vi.mocked(getPokemonDetail);
 const searchWithEvolutionsMock = vi.mocked(searchWithEvolutions);
 const getPokemonAIDescriptionMock = vi.mocked(getPokemonAIDescription);
@@ -79,6 +83,34 @@ describe("pokemon router contracts", () => {
     const result = await caller.pokemon.detail({ id: 25 });
 
     expect(() => PokemonDetailOutputSchema.parse(result)).not.toThrow();
+  });
+
+  it("listInfinite output conforms to shared schema", async () => {
+    listPokemonInfiniteMock.mockResolvedValueOnce({
+      items: [
+        {
+          id: 25,
+          name: "pikachu",
+          generation: "generation-i",
+          types: ["electric"],
+          image: "https://img/pikachu.png",
+        },
+      ],
+      total: 151,
+      page: 1,
+      pageSize: 20,
+      hasNextPage: true,
+      nextCursor: 2,
+    });
+
+    const result = await caller.pokemon.listInfinite({
+      search: "",
+      limit: 20,
+      cursor: 1,
+      sort: "id-asc",
+    });
+
+    expect(() => ListPokemonInfiniteOutputSchema.parse(result)).not.toThrow();
   });
 
   it("searchWithEvolutions output conforms to shared schema", async () => {

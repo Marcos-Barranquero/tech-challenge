@@ -66,6 +66,24 @@ export const ListPokemonOutputSchema = z.object({
   hasNextPage: z.boolean(),
 });
 
+export const ListPokemonInfiniteInputSchema = z.object({
+  search: z.string().trim().default(""),
+  type: PokemonTypeSchema.optional(),
+  generation: GenerationSchema.optional(),
+  cursor: z.number().int().min(1).optional(),
+  limit: z.number().int().min(1).max(60).default(60),
+  sort: z.enum(["id-asc"]).default("id-asc"),
+});
+
+export const ListPokemonInfiniteOutputSchema = z.object({
+  items: z.array(PokemonListItemSchema),
+  total: z.number().int().nonnegative(),
+  page: z.number().int().min(1),
+  pageSize: z.number().int().min(1),
+  hasNextPage: z.boolean(),
+  nextCursor: z.number().int().min(1).nullable(),
+});
+
 export const PokemonStatSchema = z.object({
   name: z.string(),
   value: z.number().int().nonnegative(),
@@ -133,6 +151,8 @@ export type SupportedLocale = z.infer<typeof SupportedLocaleSchema>;
 export type PokemonListItem = z.infer<typeof PokemonListItemSchema>;
 export type ListPokemonInput = z.infer<typeof ListPokemonInputSchema>;
 export type ListPokemonOutput = z.infer<typeof ListPokemonOutputSchema>;
+export type ListPokemonInfiniteInput = z.infer<typeof ListPokemonInfiniteInputSchema>;
+export type ListPokemonInfiniteOutput = z.infer<typeof ListPokemonInfiniteOutputSchema>;
 export type PokemonDetailInput = z.infer<typeof PokemonDetailInputSchema>;
 export type PokemonDetailOutput = z.infer<typeof PokemonDetailOutputSchema>;
 export type SearchWithEvolutionsInput = z.infer<

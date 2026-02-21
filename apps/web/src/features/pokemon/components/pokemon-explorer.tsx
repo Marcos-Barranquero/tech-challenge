@@ -7,12 +7,12 @@ import { PokemonCard } from "./pokemon-card";
 import { PokemonListSkeleton } from "./pokemon-list-skeleton";
 import { PokemonEmptyState } from "./pokemon-empty-state";
 import { PokemonInlineDetail } from "./pokemon-inline-detail";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function PokemonExplorer() {
-  const { items, isLoading } = usePokemonList();
+  const { items, isLoading, isInitialLoading, hasNextPage, isFetchingNextPage, loadMore } = usePokemonList();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -52,6 +52,37 @@ export function PokemonExplorer() {
     router.push(query ? `${basePath}?${query}` : basePath, { scroll: false });
   }, [basePath, router, searchParams]);
 
+  const listPanelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isDetailView) {
+      return;
+    }
+
+    const node = listPanelRef.current;
+    if (!node) {
+      return;
+    }
+
+    const maybeLoadMore = () => {
+      if (!hasNextPage || isFetchingNextPage) {
+        return;
+      }
+
+      const threshold = 220;
+      const remaining = node.scrollHeight - node.scrollTop - node.clientHeight;
+      if (remaining <= threshold) {
+        loadMore();
+      }
+    };
+
+    node.addEventListener("scroll", maybeLoadMore, { passive: true });
+    // Trigger once on mount/update in case content does not fill the container yet.
+    maybeLoadMore();
+
+    return () => node.removeEventListener("scroll", maybeLoadMore);
+  }, [hasNextPage, isDetailView, isFetchingNextPage, loadMore]);
+
   return (
     <main id="main-content" className="relative z-10 mx-auto max-w-[1500px] px-4 py-6 md:py-8">
       <section className="gba-console" aria-live="polite">
@@ -68,23 +99,31 @@ export function PokemonExplorer() {
 
             <div className="screen-reel">
               <div className={`screen-carousel ${isDetailView ? "is-detail" : ""}`}>
-                <div className="screen-panel screen-panel-list">
-                  {isLoading && <PokemonListSkeleton />}
+                <div ref={listPanelRef} className="screen-panel screen-panel-list">
+                  {isInitialLoading && <PokemonListSkeleton />}
 
-                  {!isLoading && items.length === 0 && <PokemonEmptyState />}
+                  {!isLoading && !isInitialLoading && items.length === 0 && <PokemonEmptyState />}
 
-                  {!isLoading && items.length > 0 && (
-                    <div className="screen-grid">
-                      {items.map((pokemon) => (
-                        <div key={pokemon.id} className="slot-item">
-                          <PokemonCard
-                            pokemon={pokemon}
-                            href={getPokemonHref(pokemon.id)}
-                            onSelect={openPokemon}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                  {!isInitialLoading && items.length > 0 && (
+                    <>
+                      <div className="screen-grid">
+                        {items.map((pokemon) => (
+                          <div key={pokemon.id} className="slot-item">
+                            <PokemonCard
+                              pokemon={pokemon}
+                              href={getPokemonHref(pokemon.id)}
+                              onSelect={openPokemon}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="h-8" aria-hidden="true" />
+                      {isFetchingNextPage && (
+                        <p className="gba-ui-font pb-2 text-center text-[12px] text-[#3d336b]">
+                          Loading more Pokemon...
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
 

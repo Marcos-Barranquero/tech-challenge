@@ -23,13 +23,37 @@ import {
 const PORT = Number(process.env.PORT ?? 4000);
 const HOST = process.env.HOST ?? "0.0.0.0";
 const CACHE_WARMUP_DELAY_MS = Number(process.env.CACHE_WARMUP_DELAY_MS ?? 500);
+const CACHE_WARMUP_MODE = (process.env.CACHE_WARMUP_MODE ?? "initial").toLowerCase();
+const CACHE_WARMUP_PAGE_SIZE = Number(process.env.CACHE_WARMUP_PAGE_SIZE ?? 60);
 
-async function warmupCache() {
-  // Warm up only the most used query path (index + first page list).
+async function warmupCache(mode: "initial" | "full") {
+  const pageSize = Number.isFinite(CACHE_WARMUP_PAGE_SIZE)
+    ? Math.max(1, Math.min(60, CACHE_WARMUP_PAGE_SIZE))
+    : 60;
+
+  if (mode === "full") {
+    let page = 1;
+    // Preload all list pages in ascending ID order.
+    while (true) {
+      const result = await listPokemon({
+        search: "",
+        page,
+        pageSize,
+        sort: "id-asc",
+      });
+      if (!result.hasNextPage) {
+        break;
+      }
+      page += 1;
+    }
+    return;
+  }
+
+  // Preload index + first page only.
   await listPokemon({
     search: "",
     page: 1,
-    pageSize: 20,
+    pageSize,
     sort: "id-asc",
   });
 }
@@ -186,11 +210,12 @@ async function bootstrap() {
 
   setTimeout(() => {
     void (async () => {
-      app.log.info("Starting cache warm-up job");
+      const mode = CACHE_WARMUP_MODE === "full" ? "full" : "initial";
+      app.log.info({ mode }, "Starting cache warm-up job");
       const startedAt = Date.now();
       try {
-        await warmupCache();
-        app.log.info({ durationMs: Date.now() - startedAt }, "Cache warm-up completed");
+        await warmupCache(mode);
+        app.log.info({ durationMs: Date.now() - startedAt, mode }, "Cache warm-up completed");
       } catch (error) {
         app.log.error({ err: error }, "Cache warm-up failed");
       }
