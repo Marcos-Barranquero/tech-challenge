@@ -11,16 +11,17 @@ export function usePokemonList() {
   const selectedType = usePokemonFiltersStore(pokemonFiltersSelectors.selectedType);
   const selectedGeneration = usePokemonFiltersStore(pokemonFiltersSelectors.selectedGeneration);
   const pageSize = usePokemonFiltersStore(pokemonFiltersSelectors.pageSize);
+  const term = useMemo(() => search.trim(), [search]);
 
   const infiniteInput = useMemo(
     () => ({
-      search,
+      search: term,
       type: selectedType,
       generation: selectedGeneration,
       limit: pageSize,
       sort: "id-asc" as const
     }),
-    [pageSize, search, selectedGeneration, selectedType]
+    [pageSize, selectedGeneration, selectedType, term]
   );
 
   const listQuery = trpc.pokemon.listInfinite.useInfiniteQuery(infiniteInput, {

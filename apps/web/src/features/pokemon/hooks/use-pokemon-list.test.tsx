@@ -242,4 +242,39 @@ describe("usePokemonList", () => {
 
     expect(fetchNextPageMock).toHaveBeenCalledTimes(1);
   });
+
+  it("treats whitespace-only search as empty term", () => {
+    const store = usePokemonFiltersStore.getState();
+    store.setSearch("   ");
+
+    listInfiniteUseQueryMock.mockReturnValue({
+      data: { pages: [] },
+      isLoading: false,
+      isFetching: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      isError: false,
+      error: null,
+    });
+    listUseQueryMock.mockReturnValue({});
+    searchUseQueryMock.mockReturnValue({
+      data: { groups: [] },
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+      error: null,
+    });
+
+    renderHook(() => usePokemonList());
+
+    expect(listInfiniteUseQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ search: "" }),
+      expect.objectContaining({ enabled: true }),
+    );
+    expect(searchUseQueryMock).toHaveBeenCalledWith(
+      { term: "", limit: 10 },
+      expect.objectContaining({ enabled: false }),
+    );
+  });
 });
