@@ -18,7 +18,7 @@ export function PokemonCard({
   const t = useTranslations("detail");
 
   return (
-    <article className="group aspect-square h-full overflow-hidden rounded-md border-[3px] border-[#5b4d91] bg-[#e6e2fa] p-1.5 shadow-[0_4px_0_#4c3d7d,0_10px_18px_rgba(37,30,77,0.22)] transition duration-200 ease-poke hover:-translate-y-0.5">
+    <article className="group h-full w-full overflow-hidden rounded-md border-[3px] border-[#5b4d91] bg-[#e6e2fa] p-1.5 shadow-[0_4px_0_#4c3d7d,0_10px_18px_rgba(37,30,77,0.22)] transition duration-200 ease-poke hover:-translate-y-0.5">
       <Link
         href={href}
         onClick={(event) => {

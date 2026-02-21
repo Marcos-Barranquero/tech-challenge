@@ -106,9 +106,10 @@ export function PokemonExplorer() {
       const insetBlock = isMobile ? 12 : isTablet ? 14 : 16;
       const width = node.clientWidth;
       const height = node.clientHeight;
-      const availableWidth = Math.max(0, width - insetInline * 2 - gap * (cols - 1));
-      const availableHeight = Math.max(0, height - insetBlock * 2 - gap * (gridRows - 1));
-      const tile = Math.max(56, Math.floor(Math.min(availableWidth / cols, availableHeight / gridRows)));
+      const safety = 3;
+      const availableWidth = Math.max(0, width - insetInline * 2 - gap * (cols - 1) - safety);
+      const availableHeight = Math.max(0, height - insetBlock * 2 - gap * (gridRows - 1) - safety);
+      const tile = Math.max(24, Math.floor(Math.min(availableWidth / cols, availableHeight / gridRows)));
 
       setGridCols(cols);
       setGridStyle({
@@ -117,6 +118,7 @@ export function PokemonExplorer() {
         ["--grid-gap" as string]: `${gap}px`,
         ["--grid-inset-inline" as string]: `${insetInline}px`,
         ["--grid-inset-block" as string]: `${insetBlock}px`,
+        ["--page-height" as string]: `${height}px`,
         ["--tile-size" as string]: `${tile}px`,
       } as CSSProperties);
     };
@@ -186,9 +188,8 @@ export function PokemonExplorer() {
                           </section>
                         ))}
                       </div>
-                      <div className="h-2" aria-hidden="true" />
                       {isFetchingNextPage && (
-                        <p className="gba-ui-font pb-2 text-center text-[12px] text-[#3d336b]">
+                        <p className="screen-loading-more gba-ui-font text-center text-[12px] text-[#3d336b]">
                           Loading more Pokemon...
                         </p>
                       )}
