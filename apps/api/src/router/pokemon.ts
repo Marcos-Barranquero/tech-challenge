@@ -1,5 +1,6 @@
 import {
   GenerationSchema,
+  ListPokemonInfiniteInputSchema,
   ListPokemonInputSchema,
   PokemonAIDescriptionInputSchema,
   PokemonDetailInputSchema,
@@ -11,6 +12,7 @@ import { AiProviderError } from "../lib/ai-provider.js";
 import { PokeApiError } from "../lib/pokeapi-client.js";
 import {
   getPokemonDetail,
+  listPokemonInfinite,
   listPokemon,
   searchWithEvolutions,
 } from "../services/pokemon.service.js";
@@ -23,6 +25,23 @@ export const pokemonRouter = createTRPCRouter({
     .query(async ({ input }) => {
       try {
         return await listPokemon(input);
+      } catch (error) {
+        if (error instanceof PokeApiError) {
+          throw new TRPCError({
+            code: "BAD_GATEWAY",
+            message: "PokeAPI is unavailable",
+            cause: error,
+          });
+        }
+        throw error;
+      }
+    }),
+
+  listInfinite: publicProcedure
+    .input(ListPokemonInfiniteInputSchema)
+    .query(async ({ input }) => {
+      try {
+        return await listPokemonInfinite(input);
       } catch (error) {
         if (error instanceof PokeApiError) {
           throw new TRPCError({

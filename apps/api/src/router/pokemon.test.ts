@@ -6,6 +6,7 @@ import { AiProviderError } from "../lib/ai-provider.js";
 
 vi.mock("../services/pokemon.service.js", () => ({
   listPokemon: vi.fn(),
+  listPokemonInfinite: vi.fn(),
   getPokemonDetail: vi.fn(),
   searchWithEvolutions: vi.fn(),
 }));
@@ -16,12 +17,14 @@ vi.mock("../services/pokemon-ai.service.js", () => ({
 
 import {
   getPokemonDetail,
+  listPokemonInfinite,
   listPokemon,
   searchWithEvolutions,
 } from "../services/pokemon.service.js";
 import { getPokemonAIDescription } from "../services/pokemon-ai.service.js";
 
 const listPokemonMock = vi.mocked(listPokemon);
+const listPokemonInfiniteMock = vi.mocked(listPokemonInfinite);
 const getPokemonDetailMock = vi.mocked(getPokemonDetail);
 const searchWithEvolutionsMock = vi.mocked(searchWithEvolutions);
 const getPokemonAIDescriptionMock = vi.mocked(getPokemonAIDescription);
@@ -41,6 +44,22 @@ describe("pokemon router", () => {
         search: "",
         page: 1,
         pageSize: 10,
+        sort: "id-asc",
+      }),
+    ).rejects.toMatchObject({
+      code: "BAD_GATEWAY",
+      message: "PokeAPI is unavailable",
+    });
+  });
+
+  it("maps PokeApiError to BAD_GATEWAY on listInfinite", async () => {
+    listPokemonInfiniteMock.mockRejectedValueOnce(new PokeApiError("boom", 503, "/pokemon"));
+
+    await expect(
+      caller.pokemon.listInfinite({
+        search: "",
+        cursor: 1,
+        limit: 10,
         sort: "id-asc",
       }),
     ).rejects.toMatchObject({

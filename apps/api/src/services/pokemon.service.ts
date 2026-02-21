@@ -1,5 +1,8 @@
 import {
+  ListPokemonInfiniteOutputSchema,
   ListPokemonOutputSchema,
+  type ListPokemonInfiniteInput,
+  type ListPokemonInfiniteOutput,
   PokemonDetailOutputSchema,
   type ListPokemonInput,
   type ListPokemonOutput,
@@ -55,6 +58,26 @@ export async function listPokemon(input: ListPokemonInput): Promise<ListPokemonO
     page: input.page,
     pageSize: input.pageSize,
     hasNextPage: end < filtered.length,
+  });
+}
+
+export async function listPokemonInfinite(
+  input: ListPokemonInfiniteInput,
+): Promise<ListPokemonInfiniteOutput> {
+  const page = input.cursor ?? 1;
+  const pageSize = input.limit;
+  const base = await listPokemon({
+    search: input.search,
+    type: input.type,
+    generation: input.generation,
+    page,
+    pageSize,
+    sort: input.sort,
+  });
+
+  return ListPokemonInfiniteOutputSchema.parse({
+    ...base,
+    nextCursor: base.hasNextPage ? page + 1 : null,
   });
 }
 

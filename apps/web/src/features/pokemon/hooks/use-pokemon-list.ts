@@ -2,7 +2,7 @@
 
 import { trpc } from "@/lib/trpc";
 import toast from "react-hot-toast";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { usePokemonFiltersStore, pokemonFiltersSelectors } from "@/stores/pokemon-filters.store";
 import type { PokemonListItem } from "@tech-challenge/shared";
 
@@ -10,27 +10,30 @@ export function usePokemonList() {
   const search = usePokemonFiltersStore(pokemonFiltersSelectors.search);
   const selectedType = usePokemonFiltersStore(pokemonFiltersSelectors.selectedType);
   const selectedGeneration = usePokemonFiltersStore(pokemonFiltersSelectors.selectedGeneration);
+  const pageSize = usePokemonFiltersStore(pokemonFiltersSelectors.pageSize);
+  const term = useMemo(() => search.trim(), [search]);
 
-  const queryInput = useMemo(
+  const infiniteInput = useMemo(
     () => ({
-      search,
+      search: term,
       type: selectedType,
       generation: selectedGeneration,
-      page: 1,
-      pageSize: 60,
+      limit: pageSize,
       sort: "id-asc" as const
     }),
-    [search, selectedGeneration, selectedType]
+    [pageSize, selectedGeneration, selectedType, term]
   );
 
-  const listQuery = trpc.pokemon.list.useQuery(queryInput, {
-    enabled: queryInput.search.length === 0
+  const listQuery = trpc.pokemon.listInfinite.useInfiniteQuery(infiniteInput, {
+    enabled: infiniteInput.search.length === 0,
+    initialCursor: 1,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
   const searchQuery = trpc.pokemon.searchWithEvolutions.useQuery(
-    { term: queryInput.search, limit: 10 },
+    { term: infiniteInput.search, limit: 10 },
     {
-      enabled: queryInput.search.length > 0
+      enabled: infiniteInput.search.length > 0
     }
   );
 
@@ -42,8 +45,17 @@ export function usePokemonList() {
   }, [listQuery.error, searchQuery.error]);
 
   const items = useMemo(() => {
-    if (queryInput.search.length === 0) {
-      return listQuery.data?.items ?? [];
+    if (infiniteInput.search.length === 0) {
+      const pages = listQuery.data?.pages ?? [];
+      const merged = pages.flatMap((page) => page.items);
+      const seen = new Set<number>();
+      return merged.filter((item) => {
+        if (seen.has(item.id)) {
+          return false;
+        }
+        seen.add(item.id);
+        return true;
+      });
     }
 
     const grouped = searchQuery.data?.groups ?? [];
@@ -56,25 +68,57 @@ export function usePokemonList() {
       }
       seen.add(p.id);
 
-      if (queryInput.type && !p.types.includes(queryInput.type)) {
+      if (infiniteInput.type && !p.types.includes(infiniteInput.type)) {
         return false;
       }
-      if (queryInput.generation && p.generation !== queryInput.generation) {
+      if (infiniteInput.generation && p.generation !== infiniteInput.generation) {
         return false;
       }
       return true;
     });
-  }, [listQuery.data?.items, queryInput.generation, queryInput.search.length, queryInput.type, searchQuery.data?.groups]);
+  }, [
+    infiniteInput.generation,
+    infiniteInput.search.length,
+    infiniteInput.type,
+    listQuery.data?.pages,
+    searchQuery.data?.groups,
+  ]);
 
-  const total = queryInput.search.length === 0 ? (listQuery.data?.total ?? 0) : items.length;
+  const total = infiniteInput.search.length === 0
+    ? (listQuery.data?.pages?.[0]?.total ?? items.length)
+    : items.length;
   const isLoading = listQuery.isLoading || searchQuery.isLoading;
   const isFetching = listQuery.isFetching || searchQuery.isFetching;
+  const hasNextPage = infiniteInput.search.length === 0 ? (listQuery.hasNextPage ?? false) : false;
+  const isFetchingNextPage = infiniteInput.search.length === 0 && listQuery.isFetchingNextPage;
+  const isInitialLoading =
+    infiniteInput.search.length === 0
+      ? listQuery.isLoading && items.length === 0
+      : searchQuery.isLoading && items.length === 0;
+
+  const loadMore = useCallback(() => {
+    if (infiniteInput.search.length > 0) {
+      return;
+    }
+    if (listQuery.isFetchingNextPage) {
+      return;
+    }
+    if (!listQuery.hasNextPage) {
+      return;
+    }
+
+    void listQuery.fetchNextPage();
+  }, [infiniteInput.search.length, listQuery]);
 
   return {
     items,
     total,
+    hasNextPage,
+    isInitialLoading,
     isLoading,
     isFetching,
-    isError: listQuery.isError || searchQuery.isError
+    isFetchingNextPage,
+    isError: listQuery.isError || searchQuery.isError,
+    loadMore,
   };
 }
