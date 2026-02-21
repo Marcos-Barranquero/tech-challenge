@@ -169,8 +169,7 @@ h4 {
   --tile-size: clamp(154px, 12vw, 196px);
   --grid-gap: 12px;
   --screen-pad: 18px;
-  --screen-controls-height: 88px;
-  --screen-height: calc((var(--tile-size) * 2) + var(--grid-gap) + (var(--screen-pad) * 2) + var(--screen-controls-height));
+  --screen-height: clamp(560px, 76vh, 820px);
   display: flex;
   flex-direction: column;
   height: var(--screen-height);
@@ -534,7 +533,6 @@ h4 {
   .gba-screen {
     --tile-size: clamp(124px, 34vw, 154px);
     --screen-pad: 10px;
-    --screen-controls-height: 40px;
     --screen-height: min(76vh, 620px);
   }
 
