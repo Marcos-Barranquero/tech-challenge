@@ -1,5 +1,5 @@
 import { PokemonDetailView } from "@/features/pokemon/components/pokemon-detail-view";
-import { PokemonDetailOutputSchema, type PokemonDetailOutput } from "@tech-challenge/shared";
+import type { PokemonDetailOutput } from "@tech-challenge/shared";
 import { notFound } from "next/navigation";
 
 function getApiBaseUrl(): string {
@@ -21,17 +21,31 @@ async function fetchPokemonDetailFromServer(id: number): Promise<PokemonDetailOu
     return undefined;
   }
 
-  const payload = await response.json();
-  const parsed = PokemonDetailOutputSchema.safeParse(payload);
-  return parsed.success ? parsed.data : undefined;
+  const payload = (await response.json()) as Partial<PokemonDetailOutput>;
+  if (typeof payload.id !== "number" || payload.id <= 0) {
+    return undefined;
+  }
+
+  if (
+    typeof payload.name !== "string" ||
+    typeof payload.image !== "string" ||
+    !Array.isArray(payload.types) ||
+    !Array.isArray(payload.stats) ||
+    !Array.isArray(payload.evolutions)
+  ) {
+    return undefined;
+  }
+
+  return payload as PokemonDetailOutput;
 }
 
 export default async function PokemonDetailPage({
   params
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const id = Number(params.id);
+  const { id: rawId } = await params;
+  const id = Number(rawId);
   if (!Number.isInteger(id) || id <= 0) {
     notFound();
   }

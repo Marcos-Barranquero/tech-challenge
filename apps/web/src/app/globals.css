@@ -169,7 +169,7 @@ h4 {
   --tile-size: clamp(154px, 12vw, 196px);
   --grid-gap: 12px;
   --screen-pad: 18px;
-  --screen-height: clamp(560px, 76vh, 820px);
+  --screen-height: clamp(470px, 58vh, 640px);
   display: flex;
   flex-direction: column;
   height: var(--screen-height);
@@ -235,6 +235,15 @@ h4 {
   scrollbar-width: auto;
   scrollbar-color: #7c7c8f #d8d8ea;
   padding: var(--screen-pad) 14px;
+  --grid-cols: 6;
+  --grid-rows: 2;
+  --grid-gap: 10px;
+  --grid-inset-inline: 8px;
+  --grid-inset-block: 8px;
+  /* Desktop math (6x2): insets 8*2=16, horizontal gaps 5*10=50, vertical gaps 1*10=10 */
+  --tile-size-by-width: calc((100% - 16px - 50px) / 6);
+  --tile-size-by-height: calc((100% - 16px - 10px) / 2);
+  --tile-size: min(var(--tile-size-by-width), var(--tile-size-by-height));
   background:
     radial-gradient(circle at 12% 24%, rgba(128, 206, 136, 0.34), transparent 28%),
     radial-gradient(circle at 78% 62%, rgba(252, 211, 77, 0.22), transparent 34%),
@@ -257,6 +266,9 @@ h4 {
 }
 
 .screen-panel-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 10px 14px var(--screen-pad);
@@ -265,11 +277,14 @@ h4 {
 
 .screen-grid {
   display: grid;
-  grid-template-columns: repeat(5, var(--tile-size));
+  grid-template-columns: repeat(var(--grid-cols), var(--tile-size));
   grid-auto-rows: var(--tile-size);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--grid-inset-block) var(--grid-inset-inline);
   justify-content: center;
   gap: var(--grid-gap);
-  padding: 0;
 }
 
 .slot-item {
@@ -286,7 +301,7 @@ h4 {
 }
 
 .gba-brand-wrap {
-  margin-top: 6px;
+  margin-top: 4px;
   text-align: center;
 }
 
@@ -465,13 +480,17 @@ h4 {
   .gba-screen {
     --tile-size: clamp(118px, 17vw, 160px);
     --screen-pad: 14px;
-    --screen-height: min(72vh, 620px);
+    --screen-height: min(60vh, 540px);
   }
 
-  .screen-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: auto;
-    justify-content: stretch;
+  .screen-panel-list {
+    --grid-cols: 3;
+    --grid-gap: 10px;
+    --grid-inset-inline: 6px;
+    --grid-inset-block: 6px;
+    /* Tablet math (3x2): insets 6*2=12, horizontal gaps 2*10=20, vertical gaps 1*10=10 */
+    --tile-size-by-width: calc((100% - 12px - 20px) / 3);
+    --tile-size-by-height: calc((100% - 12px - 10px) / 2);
   }
 
   .screen-sticky {
@@ -549,9 +568,14 @@ h4 {
     inset: 4px;
   }
 
-  .screen-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: auto;
+  .screen-panel-list {
+    --grid-cols: 2;
+    --grid-gap: 8px;
+    --grid-inset-inline: 4px;
+    --grid-inset-block: 4px;
+    /* Mobile math (2x2): insets 4*2=8, horizontal gaps 1*8=8, vertical gaps 1*8=8 */
+    --tile-size-by-width: calc((100% - 8px - 8px) / 2);
+    --tile-size-by-height: calc((100% - 8px - 8px) / 2);
   }
 
   .screen-panel-list {

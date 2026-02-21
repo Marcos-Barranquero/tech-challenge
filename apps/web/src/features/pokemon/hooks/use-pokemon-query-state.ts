@@ -1,11 +1,41 @@
 "use client";
 
-import { GenerationSchema, PokemonTypeSchema, type Generation, type PokemonType } from "@tech-challenge/shared";
+import type { Generation, PokemonType } from "@tech-challenge/shared";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-const POKEMON_TYPES = new Set<string>(PokemonTypeSchema.options);
-const GENERATIONS = new Set<string>(GenerationSchema.options);
+const POKEMON_TYPES = new Set<string>([
+  "normal",
+  "fire",
+  "water",
+  "electric",
+  "grass",
+  "ice",
+  "fighting",
+  "poison",
+  "ground",
+  "flying",
+  "psychic",
+  "bug",
+  "rock",
+  "ghost",
+  "dragon",
+  "dark",
+  "steel",
+  "fairy",
+]);
+
+const GENERATIONS = new Set<string>([
+  "generation-i",
+  "generation-ii",
+  "generation-iii",
+  "generation-iv",
+  "generation-v",
+  "generation-vi",
+  "generation-vii",
+  "generation-viii",
+  "generation-ix",
+]);
 
 function parseType(value: string | null): PokemonType | undefined {
   if (!value) {

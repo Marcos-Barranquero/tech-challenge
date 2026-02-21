@@ -7,7 +7,8 @@ import { PokemonCard } from "./pokemon-card";
 import { PokemonListSkeleton } from "./pokemon-list-skeleton";
 import { PokemonEmptyState } from "./pokemon-empty-state";
 import { PokemonInlineDetail } from "./pokemon-inline-detail";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { GbaThemePicker } from "./gba-theme-picker";
@@ -56,6 +57,7 @@ export function PokemonExplorer() {
   }, [basePath, router, searchParams]);
 
   const listPanelRef = useRef<HTMLDivElement | null>(null);
+  const [gridStyle, setGridStyle] = useState<CSSProperties>({});
 
   useEffect(() => {
     if (isDetailView) {
@@ -86,6 +88,45 @@ export function PokemonExplorer() {
     return () => node.removeEventListener("scroll", maybeLoadMore);
   }, [hasNextPage, isDetailView, isFetchingNextPage, loadMore]);
 
+  useEffect(() => {
+    const node = listPanelRef.current;
+    if (!node) {
+      return;
+    }
+
+    const rows = 2;
+
+    const compute = () => {
+      const viewportWidth = window.innerWidth;
+      const isMobile = viewportWidth <= 768;
+      const isTablet = viewportWidth <= 1200 && !isMobile;
+      const cols = isMobile ? 2 : isTablet ? 3 : 6;
+      const gap = isMobile ? 8 : 10;
+      const insetInline = isMobile ? 4 : isTablet ? 6 : 8;
+      const insetBlock = isMobile ? 4 : isTablet ? 6 : 8;
+      const width = node.clientWidth;
+      const height = node.clientHeight;
+      const availableWidth = Math.max(0, width - insetInline * 2 - gap * (cols - 1));
+      const availableHeight = Math.max(0, height - insetBlock * 2 - gap * (rows - 1));
+      const tile = Math.max(56, Math.floor(Math.min(availableWidth / cols, availableHeight / rows)));
+
+      setGridStyle({
+        ["--grid-cols" as string]: String(cols),
+        ["--grid-rows" as string]: String(rows),
+        ["--grid-gap" as string]: `${gap}px`,
+        ["--grid-inset-inline" as string]: `${insetInline}px`,
+        ["--grid-inset-block" as string]: `${insetBlock}px`,
+        ["--tile-size" as string]: `${tile}px`,
+      } as CSSProperties);
+    };
+
+    const observer = new ResizeObserver(compute);
+    observer.observe(node);
+    compute();
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <main
       id="main-content"
@@ -105,7 +146,7 @@ export function PokemonExplorer() {
 
             <div className="screen-reel">
               <div className={`screen-carousel ${isDetailView ? "is-detail" : ""}`}>
-                <div ref={listPanelRef} className="screen-panel screen-panel-list">
+                <div ref={listPanelRef} style={gridStyle} className="screen-panel screen-panel-list">
                   {isInitialLoading && <PokemonListSkeleton />}
 
                   {!isLoading && !isInitialLoading && items.length === 0 && <PokemonEmptyState />}
@@ -176,7 +217,7 @@ export function PokemonExplorer() {
           <p className="pokemon-title gba-brand text-yellow-300">POKEDEX</p>
         </div>
       </section>
-      <div className="mt-2 flex justify-center">
+      <div className="mt-1.5 flex justify-center">
         <LanguageSwitcher />
       </div>
     </main>
