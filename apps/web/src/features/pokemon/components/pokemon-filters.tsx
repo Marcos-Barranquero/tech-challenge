@@ -9,6 +9,10 @@ export function PokemonFilters() {
   const { selectedType, selectedGeneration, setType, setGeneration, clearFilters } = usePokemonQueryState();
   const { data } = usePokemonMeta();
   const t = useTranslations("filters");
+  const formatTypeLabel = (type: PokemonType) => {
+    const translated = t(`types.${type}`);
+    return translated.charAt(0).toUpperCase() + translated.slice(1);
+  };
 
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -25,8 +29,8 @@ export function PokemonFilters() {
         >
           <option value="">{t("typeAll")}</option>
           {data?.types.map((type) => (
-            <option key={type} value={type} className="capitalize">
-              {type}
+            <option key={type} value={type}>
+              {formatTypeLabel(type)}
             </option>
           ))}
         </select>

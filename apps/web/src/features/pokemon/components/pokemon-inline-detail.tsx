@@ -27,6 +27,11 @@ export function PokemonInlineDetail({
   const locale = useLocaleStore((state) => state.locale);
   const aiDescriptionQuery = usePokemonAiDescription(id, locale, regenerationNonce);
   const t = useTranslations("detail");
+  const tf = useTranslations("filters");
+  const formatTypeLabel = (type: PokemonType) => {
+    const translated = tf(`types.${type}`);
+    return translated.charAt(0).toUpperCase() + translated.slice(1);
+  };
   const previousIdRef = useRef<number | null>(null);
   const pendingDirectionRef = useRef<"up" | "down" | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<"up" | "down" | null>(null);
@@ -102,9 +107,9 @@ export function PokemonInlineDetail({
               {data.types.map((type: PokemonType) => (
                 <li
                   key={type}
-                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[9px] uppercase sm:px-2 sm:py-1 sm:text-[10px] md:text-[11px] ${TYPE_BADGE[type]}`}
+                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[9px] sm:px-2 sm:py-1 sm:text-[10px] md:text-[11px] ${TYPE_BADGE[type]}`}
                 >
-                  {type}
+                  {formatTypeLabel(type)}
                 </li>
               ))}
             </ul>
