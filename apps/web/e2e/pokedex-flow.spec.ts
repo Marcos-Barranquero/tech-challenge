@@ -6,7 +6,7 @@ async function waitForCollectionReady(page: Page) {
 }
 
 test.describe("Pokedex flow", () => {
-  test("keeps in-memory collection state when opening/closing detail and clears it on reload", async ({
+  test("keeps URL-based collection state when opening/closing detail and across reload", async ({
     page,
   }) => {
     await waitForCollectionReady(page);
@@ -26,7 +26,7 @@ test.describe("Pokedex flow", () => {
     await expect(search).toHaveValue("pikachu");
 
     await page.reload();
-    await expect(search).toHaveValue("");
+    await expect(search).toHaveValue("pikachu");
   });
 
   test("uses query-string detail routing and evolution direction transitions", async ({ page }) => {
@@ -49,9 +49,10 @@ test.describe("Pokedex flow", () => {
   test("applies type and generation filters", async ({ page }) => {
     await waitForCollectionReady(page);
 
-    const selects = page.getByRole("combobox");
-    await selects.nth(0).selectOption("water");
-    await selects.nth(1).selectOption("generation-i");
+    await page.getByRole("combobox", { name: /type/i }).selectOption("water");
+    await page.getByRole("combobox", { name: /generation/i }).selectOption("generation-i");
+    await expect(page).toHaveURL(/type=water/);
+    await expect(page).toHaveURL(/generation=generation-i/);
 
     const cards = page.locator(".screen-grid article");
     await expect(cards.first()).toBeVisible();

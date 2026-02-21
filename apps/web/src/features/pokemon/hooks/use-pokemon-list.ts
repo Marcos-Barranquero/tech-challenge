@@ -3,14 +3,12 @@
 import { trpc } from "@/lib/trpc";
 import toast from "react-hot-toast";
 import { useCallback, useEffect, useMemo } from "react";
-import { usePokemonFiltersStore, pokemonFiltersSelectors } from "@/stores/pokemon-filters.store";
 import type { PokemonListItem } from "@tech-challenge/shared";
+import { usePokemonQueryState } from "./use-pokemon-query-state";
 
 export function usePokemonList() {
-  const search = usePokemonFiltersStore(pokemonFiltersSelectors.search);
-  const selectedType = usePokemonFiltersStore(pokemonFiltersSelectors.selectedType);
-  const selectedGeneration = usePokemonFiltersStore(pokemonFiltersSelectors.selectedGeneration);
-  const pageSize = usePokemonFiltersStore(pokemonFiltersSelectors.pageSize);
+  const { search, selectedType, selectedGeneration } = usePokemonQueryState();
+  const pageSize = 60;
   const term = useMemo(() => search.trim(), [search]);
 
   const infiniteInput = useMemo(

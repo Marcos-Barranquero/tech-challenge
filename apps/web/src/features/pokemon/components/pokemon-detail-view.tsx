@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { TYPE_BADGE } from "@/lib/constants";
 import { ChevronLeft } from "lucide-react";
-import type { PokemonType } from "@tech-challenge/shared";
+import type { PokemonDetailOutput, PokemonType } from "@tech-challenge/shared";
 
-export function PokemonDetailView({ id }: { id: number }) {
-  const { data, isLoading } = usePokemonDetail(id);
+export function PokemonDetailView({ id, initialData }: { id: number; initialData?: PokemonDetailOutput }) {
+  const { data, isLoading } = usePokemonDetail(id, initialData);
 
   if (isLoading || !data) {
     return (

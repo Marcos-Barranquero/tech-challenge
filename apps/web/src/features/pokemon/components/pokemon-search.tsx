@@ -1,7 +1,7 @@
 "use client";
 
-import { pokemonFiltersSelectors, usePokemonFiltersStore } from "@/stores/pokemon-filters.store";
 import { useTranslations } from "next-intl";
+import { usePokemonQueryState } from "../hooks/use-pokemon-query-state";
 
 function PokeballIcon() {
   return (
@@ -22,8 +22,7 @@ function PokeballIcon() {
 }
 
 export function PokemonSearch() {
-  const search = usePokemonFiltersStore(pokemonFiltersSelectors.search);
-  const setSearch = usePokemonFiltersStore((s) => s.setSearch);
+  const { search, setSearch } = usePokemonQueryState();
   const t = useTranslations("search");
 
   return (

@@ -2,19 +2,15 @@
 
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { usePokemonFiltersStore } from "@/stores/pokemon-filters.store";
 
-const listUseQueryMock = vi.fn();
 const listInfiniteUseQueryMock = vi.fn();
 const searchUseQueryMock = vi.fn();
 const toastErrorMock = vi.fn();
+const queryStateMock = vi.fn();
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     pokemon: {
-      list: {
-        useQuery: (...args: unknown[]) => listUseQueryMock(...args),
-      },
       listInfinite: {
         useInfiniteQuery: (...args: unknown[]) => listInfiniteUseQueryMock(...args),
       },
@@ -23,6 +19,10 @@ vi.mock("@/lib/trpc", () => ({
       },
     },
   },
+}));
+
+vi.mock("./use-pokemon-query-state", () => ({
+  usePokemonQueryState: () => queryStateMock(),
 }));
 
 vi.mock("react-hot-toast", () => ({
@@ -36,7 +36,11 @@ import { usePokemonList } from "./use-pokemon-list";
 describe("usePokemonList", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    usePokemonFiltersStore.getState().resetAll();
+    queryStateMock.mockReturnValue({
+      search: "",
+      selectedType: undefined,
+      selectedGeneration: undefined,
+    });
   });
 
   it("uses list query when search is empty", () => {
@@ -69,7 +73,7 @@ describe("usePokemonList", () => {
       isError: false,
       error: null,
     });
-    listUseQueryMock.mockReturnValue({});
+
     searchUseQueryMock.mockReturnValue({ data: { groups: [] }, isLoading: false, isFetching: false, isError: false, error: null });
 
     const { result } = renderHook(() => usePokemonList());
@@ -87,9 +91,11 @@ describe("usePokemonList", () => {
   });
 
   it("merges and deduplicates searchWithEvolutions results and applies filters", () => {
-    const store = usePokemonFiltersStore.getState();
-    store.setSearch("chu");
-    store.setType("electric");
+    queryStateMock.mockReturnValue({
+      search: "chu",
+      selectedType: "electric",
+      selectedGeneration: undefined,
+    });
 
     listInfiniteUseQueryMock.mockReturnValue({
       data: { pages: [] },
@@ -101,7 +107,7 @@ describe("usePokemonList", () => {
       isError: false,
       error: null,
     });
-    listUseQueryMock.mockReturnValue({});
+
     searchUseQueryMock.mockReturnValue({
       data: {
         groups: [
@@ -183,7 +189,7 @@ describe("usePokemonList", () => {
       isError: true,
       error: new Error("List failed"),
     });
-    listUseQueryMock.mockReturnValue({});
+
     searchUseQueryMock.mockReturnValue({
       data: { groups: [] },
       isLoading: false,
@@ -228,7 +234,7 @@ describe("usePokemonList", () => {
       isError: false,
       error: null,
     });
-    listUseQueryMock.mockReturnValue({});
+
     searchUseQueryMock.mockReturnValue({
       data: { groups: [] },
       isLoading: false,
@@ -244,8 +250,11 @@ describe("usePokemonList", () => {
   });
 
   it("treats whitespace-only search as empty term", () => {
-    const store = usePokemonFiltersStore.getState();
-    store.setSearch("   ");
+    queryStateMock.mockReturnValue({
+      search: "   ",
+      selectedType: undefined,
+      selectedGeneration: undefined,
+    });
 
     listInfiniteUseQueryMock.mockReturnValue({
       data: { pages: [] },
@@ -257,7 +266,7 @@ describe("usePokemonList", () => {
       isError: false,
       error: null,
     });
-    listUseQueryMock.mockReturnValue({});
+
     searchUseQueryMock.mockReturnValue({
       data: { groups: [] },
       isLoading: false,
