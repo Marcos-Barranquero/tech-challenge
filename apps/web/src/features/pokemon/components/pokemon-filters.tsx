@@ -1,18 +1,18 @@
 "use client";
 
-import { pokemonFiltersSelectors, usePokemonFiltersStore } from "@/stores/pokemon-filters.store";
 import { usePokemonMeta } from "../hooks/use-pokemon-meta";
 import type { Generation, PokemonType } from "@tech-challenge/shared";
 import { useTranslations } from "next-intl";
+import { usePokemonQueryState } from "../hooks/use-pokemon-query-state";
 
 export function PokemonFilters() {
-  const selectedType = usePokemonFiltersStore(pokemonFiltersSelectors.selectedType);
-  const selectedGeneration = usePokemonFiltersStore(pokemonFiltersSelectors.selectedGeneration);
-  const setType = usePokemonFiltersStore((s) => s.setType);
-  const setGeneration = usePokemonFiltersStore((s) => s.setGeneration);
-  const clearFilters = usePokemonFiltersStore((s) => s.clearFilters);
+  const { selectedType, selectedGeneration, setType, setGeneration, clearFilters } = usePokemonQueryState();
   const { data } = usePokemonMeta();
   const t = useTranslations("filters");
+  const formatTypeLabel = (type: PokemonType) => {
+    const translated = t(`types.${type}`);
+    return translated.charAt(0).toUpperCase() + translated.slice(1);
+  };
 
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -29,8 +29,8 @@ export function PokemonFilters() {
         >
           <option value="">{t("typeAll")}</option>
           {data?.types.map((type) => (
-            <option key={type} value={type} className="capitalize">
-              {type}
+            <option key={type} value={type}>
+              {formatTypeLabel(type)}
             </option>
           ))}
         </select>

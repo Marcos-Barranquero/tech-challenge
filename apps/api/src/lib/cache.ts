@@ -6,6 +6,8 @@ export const appCache = new LRUCache<string, {}>({
   allowStale: false,
 });
 
+const inFlight = new Map<string, Promise<{}>>();
+
 export async function getOrSetCache<T extends {}>(
   key: string,
   fn: () => Promise<T>,
@@ -16,7 +18,20 @@ export async function getOrSetCache<T extends {}>(
     return cached;
   }
 
-  const value = await fn();
-  appCache.set(key, value, { ttl });
-  return value;
+  const pending = inFlight.get(key) as Promise<T> | undefined;
+  if (pending) {
+    return pending;
+  }
+
+  const producerPromise = fn()
+    .then((value) => {
+      appCache.set(key, value, { ttl });
+      return value;
+    })
+    .finally(() => {
+      inFlight.delete(key);
+    });
+
+  inFlight.set(key, producerPromise);
+  return producerPromise;
 }

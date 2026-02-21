@@ -1,6 +1,6 @@
 "use client";
 
-import type { PokemonListItem } from "@tech-challenge/shared";
+import type { PokemonListItem, PokemonType } from "@tech-challenge/shared";
 import Image from "next/image";
 import Link from "next/link";
 import { TYPE_BADGE } from "@/lib/constants";
@@ -16,9 +16,14 @@ export function PokemonCard({
   onSelect: (id: number) => void;
 }) {
   const t = useTranslations("detail");
+  const tf = useTranslations("filters");
+  const formatTypeLabel = (type: PokemonType) => {
+    const translated = tf(`types.${type}`);
+    return translated.charAt(0).toUpperCase() + translated.slice(1);
+  };
 
   return (
-    <article className="group aspect-square h-full overflow-hidden rounded-md border-[3px] border-[#5b4d91] bg-[#e6e2fa] p-1.5 shadow-[0_4px_0_#4c3d7d,0_10px_18px_rgba(37,30,77,0.22)] transition duration-200 ease-poke hover:-translate-y-0.5">
+    <article className="group h-full w-full overflow-hidden rounded-md border-[3px] border-[#5b4d91] bg-[#e6e2fa] p-1.5 shadow-[0_4px_0_#4c3d7d,0_10px_18px_rgba(37,30,77,0.22)] transition duration-200 ease-poke hover:-translate-y-0.5">
       <Link
         href={href}
         onClick={(event) => {
@@ -67,9 +72,9 @@ export function PokemonCard({
               {pokemon.types.map((type) => (
                 <li
                   key={type}
-                  className={`gba-ui-font rounded-sm border px-1 py-0.5 text-[8px] uppercase sm:px-1.5 sm:text-[9px] xl:text-[10px] ${TYPE_BADGE[type]}`}
+                  className={`gba-ui-font rounded-sm border px-1 py-0.5 text-[8px] sm:px-1.5 sm:text-[9px] xl:text-[10px] ${TYPE_BADGE[type]}`}
                 >
-                  {type}
+                  {formatTypeLabel(type)}
                 </li>
               ))}
             </ul>

@@ -32,4 +32,22 @@ describe("getOrSetCache", () => {
     expect(second).toEqual({ version: 2 });
     expect(producer).toHaveBeenCalledTimes(2);
   });
+
+  it("deduplicates concurrent requests for the same key", async () => {
+    const producer = vi.fn(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return { ok: true };
+    });
+
+    const [first, second, third] = await Promise.all([
+      getOrSetCache("k3", producer),
+      getOrSetCache("k3", producer),
+      getOrSetCache("k3", producer),
+    ]);
+
+    expect(first).toEqual({ ok: true });
+    expect(second).toEqual({ ok: true });
+    expect(third).toEqual({ ok: true });
+    expect(producer).toHaveBeenCalledTimes(1);
+  });
 });

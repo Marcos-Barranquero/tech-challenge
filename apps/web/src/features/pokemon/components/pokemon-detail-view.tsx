@@ -5,10 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { TYPE_BADGE } from "@/lib/constants";
 import { ChevronLeft } from "lucide-react";
-import type { PokemonType } from "@tech-challenge/shared";
+import type { PokemonDetailOutput, PokemonType } from "@tech-challenge/shared";
+import { useTranslations } from "next-intl";
 
-export function PokemonDetailView({ id }: { id: number }) {
-  const { data, isLoading } = usePokemonDetail(id);
+export function PokemonDetailView({ id, initialData }: { id: number; initialData?: PokemonDetailOutput }) {
+  const { data, isLoading } = usePokemonDetail(id, initialData);
+  const tf = useTranslations("filters");
+  const formatTypeLabel = (type: PokemonType) => {
+    const translated = tf(`types.${type}`);
+    return translated.charAt(0).toUpperCase() + translated.slice(1);
+  };
 
   if (isLoading || !data) {
     return (
@@ -41,8 +47,8 @@ export function PokemonDetailView({ id }: { id: number }) {
 
             <ul className="mt-4 flex flex-wrap gap-2" aria-label="Pokemon types">
               {data.types.map((type: PokemonType) => (
-                <li key={type} className={`rounded-full border px-3 py-1 text-xs font-bold uppercase ${TYPE_BADGE[type]}`}>
-                  {type}
+                <li key={type} className={`rounded-full border px-3 py-1 text-xs font-bold ${TYPE_BADGE[type]}`}>
+                  {formatTypeLabel(type)}
                 </li>
               ))}
             </ul>

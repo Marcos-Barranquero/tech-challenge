@@ -5,6 +5,36 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.8] - 2026-02-21
+
+### Changed
+
+- Collection screen rendering reworked to a page-based centered matrix model:
+  - desktop: `6 x 2`,
+  - tablet: `3 x 2`,
+  - mobile: `2 x 2`.
+- Matrix sizing now adapts dynamically using panel measurements (`ResizeObserver`) so card size scales with available space while preserving fixed row/column density.
+- Vertical interaction updated to hard page snapping for catalog navigation (slot-machine style), avoiding in-between partial states.
+- Spacing model clarified:
+  - independent matrix-to-screen insets,
+  - independent card-to-card gap.
+
+### Fixed
+
+- Eliminated collection card overlap and clipping across intermediate viewport sizes.
+- Prevented cards from touching GBA screen borders in resting states.
+- Fixed desktop edge case near tablet breakpoint where the matrix drifted toward the top of the screen.
+- Stabilized per-page layout height so only one centered matrix page is visible at a time.
+
+### Added
+
+- Localized Pokemon type labels for all supported languages in UI filters and content surfaces.
+- Type badges now render translated labels with leading-capital formatting (instead of all-uppercase raw API values) in:
+  - type filter dropdown,
+  - collection cards,
+  - inline detail view,
+  - standalone detail view.
+
 ## [0.0.7] - 2026-02-21
 
 ### Added

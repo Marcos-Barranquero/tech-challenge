@@ -27,6 +27,11 @@ export function PokemonInlineDetail({
   const locale = useLocaleStore((state) => state.locale);
   const aiDescriptionQuery = usePokemonAiDescription(id, locale, regenerationNonce);
   const t = useTranslations("detail");
+  const tf = useTranslations("filters");
+  const formatTypeLabel = (type: PokemonType) => {
+    const translated = tf(`types.${type}`);
+    return translated.charAt(0).toUpperCase() + translated.slice(1);
+  };
   const previousIdRef = useRef<number | null>(null);
   const pendingDirectionRef = useRef<"up" | "down" | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<"up" | "down" | null>(null);
@@ -51,26 +56,6 @@ export function PokemonInlineDetail({
     setRegenerationNonce(0);
   }, [id]);
 
-  useEffect(() => {
-    if (!aiDescriptionQuery.data) {
-      return;
-    }
-
-    const aiSource =
-      aiDescriptionQuery.data.provider === "ollama"
-        ? `AI source: ollama (${aiDescriptionQuery.data.model})`
-        : "AI source: deterministic fallback (provider unavailable)";
-
-    console.log(
-      `[Pokedex][AI] #${aiDescriptionQuery.data.id} ${aiDescriptionQuery.data.name} -> ${aiSource}`,
-      {
-        provider: aiDescriptionQuery.data.provider,
-        model: aiDescriptionQuery.data.model,
-        generatedAt: aiDescriptionQuery.data.generatedAt,
-      },
-    );
-  }, [aiDescriptionQuery.data]);
-
   if (isLoading || !data) {
     return <div className="h-80 animate-pulse rounded-lg bg-[#f3f0ff]/80" />;
   }
@@ -78,7 +63,7 @@ export function PokemonInlineDetail({
   return (
     <section
       key={transitionKey}
-      className={`h-auto min-h-full rounded-lg border-2 border-[#5f518f] bg-[#f4f1ff]/95 p-2 shadow-[0_5px_0_#4e3f82,0_12px_22px_rgba(37,30,77,0.2)] sm:p-3 md:p-4 lg:h-full ${
+      className={`flex h-full min-h-0 w-full flex-col overflow-hidden rounded-lg border-2 border-[#5f518f] bg-[#f4f1ff]/95 p-2 shadow-[0_5px_0_#4e3f82,0_12px_22px_rgba(37,30,77,0.2)] sm:p-3 md:p-4 ${
         transitionDirection === "up"
           ? "detail-reel-up"
           : transitionDirection === "down"
@@ -95,7 +80,7 @@ export function PokemonInlineDetail({
         {t("back")}
       </button>
 
-      <div className="mt-2 grid grid-cols-1 gap-2 sm:mt-3 sm:gap-3 md:grid-cols-2 lg:h-[calc(100%-56px)] lg:grid-cols-4">
+      <div className="mt-2 grid min-h-0 flex-1 grid-cols-1 gap-2 sm:mt-3 sm:gap-3 md:grid-cols-2 lg:grid-cols-4">
         <div className="flex min-h-0 flex-col rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1">
           <div className="relative h-36 sm:h-44 md:h-52 lg:min-h-0 lg:flex-1">
             <Image
@@ -122,22 +107,22 @@ export function PokemonInlineDetail({
               {data.types.map((type: PokemonType) => (
                 <li
                   key={type}
-                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[9px] uppercase sm:px-2 sm:py-1 sm:text-[10px] md:text-[11px] ${TYPE_BADGE[type]}`}
+                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[9px] sm:px-2 sm:py-1 sm:text-[10px] md:text-[11px] ${TYPE_BADGE[type]}`}
                 >
-                  {type}
+                  {formatTypeLabel(type)}
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-2">
-          <div className="grid min-h-0 grid-rows-[auto_auto] gap-2 sm:gap-3 md:h-[420px] md:grid-rows-2 lg:h-full">
-            <section className="min-h-[150px] rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[170px] sm:p-2.5 md:h-full md:min-h-0">
+        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-2 lg:flex lg:flex-col">
+          <div className="flex min-h-0 flex-col gap-2 sm:gap-3 lg:flex-1">
+            <section className="flex min-h-[150px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[170px] sm:p-2.5 lg:min-h-0">
               <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
                 {t("funFact")}
               </h3>
-              <div className="mt-2 flex h-[calc(100%-24px)] min-h-0 flex-col pb-1 sm:h-[calc(100%-28px)]">
+              <div className="mt-2 flex min-h-0 flex-1 flex-col pb-1">
                 <p
                   className="min-h-0 flex-1 overflow-y-auto pr-1 text-[12px] leading-snug text-[#2e3253] sm:text-[13px] md:text-[14px]"
                   tabIndex={0}
@@ -160,11 +145,11 @@ export function PokemonInlineDetail({
               </div>
             </section>
 
-            <section className="min-h-[170px] rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[190px] sm:p-2.5 md:h-full md:min-h-0">
+            <section className="flex min-h-[170px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[190px] sm:p-2.5 lg:min-h-0">
               <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
                 {t("stats")}
               </h3>
-              <ul className="mt-2 flex h-[calc(100%-24px)] flex-col justify-between sm:h-[calc(100%-28px)]">
+              <ul className="mt-2 flex min-h-0 flex-1 flex-col justify-between">
                 {data.stats.map((stat) => (
                   <li
                     key={stat.name}
@@ -186,11 +171,11 @@ export function PokemonInlineDetail({
           </div>
         </div>
 
-        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1">
+        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1 lg:flex lg:flex-col">
           <h3 className="gba-ui-font text-[15px] uppercase text-[#1f2033] sm:text-[18px] md:text-[20px] lg:text-[22px]">
             {t("evolutions")}
           </h3>
-          <ul className="mt-2 flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 sm:mt-3 sm:max-h-[280px] md:max-h-[340px] lg:h-[calc(100%-36px)] lg:max-h-none">
+          <ul className="mt-2 flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 sm:mt-3 sm:max-h-[280px] md:max-h-[340px] lg:min-h-0 lg:flex-1 lg:max-h-none">
             {data.evolutions.map((evo) => (
               <li key={evo.id}>
                 <Link

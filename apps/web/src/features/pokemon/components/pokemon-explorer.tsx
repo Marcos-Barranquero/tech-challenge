@@ -7,7 +7,8 @@ import { PokemonCard } from "./pokemon-card";
 import { PokemonListSkeleton } from "./pokemon-list-skeleton";
 import { PokemonEmptyState } from "./pokemon-empty-state";
 import { PokemonInlineDetail } from "./pokemon-inline-detail";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { GbaThemePicker } from "./gba-theme-picker";
@@ -56,6 +57,9 @@ export function PokemonExplorer() {
   }, [basePath, router, searchParams]);
 
   const listPanelRef = useRef<HTMLDivElement | null>(null);
+  const [gridStyle, setGridStyle] = useState<CSSProperties>({});
+  const [gridCols, setGridCols] = useState(6);
+  const gridRows = 2;
 
   useEffect(() => {
     if (isDetailView) {
@@ -86,6 +90,55 @@ export function PokemonExplorer() {
     return () => node.removeEventListener("scroll", maybeLoadMore);
   }, [hasNextPage, isDetailView, isFetchingNextPage, loadMore]);
 
+  useEffect(() => {
+    const node = listPanelRef.current;
+    if (!node) {
+      return;
+    }
+
+    const compute = () => {
+      const viewportWidth = window.innerWidth;
+      const isMobile = viewportWidth <= 768;
+      const isTablet = viewportWidth <= 1200 && !isMobile;
+      const cols = isMobile ? 2 : isTablet ? 3 : 6;
+      const gap = isMobile ? 8 : 10;
+      const insetInline = isMobile ? 14 : isTablet ? 16 : 18;
+      const insetBlock = isMobile ? 12 : isTablet ? 14 : 16;
+      const width = node.clientWidth;
+      const height = node.clientHeight;
+      const safety = 3;
+      const availableWidth = Math.max(0, width - insetInline * 2 - gap * (cols - 1) - safety);
+      const availableHeight = Math.max(0, height - insetBlock * 2 - gap * (gridRows - 1) - safety);
+      const tile = Math.max(24, Math.floor(Math.min(availableWidth / cols, availableHeight / gridRows)));
+
+      setGridCols(cols);
+      setGridStyle({
+        ["--grid-cols" as string]: String(cols),
+        ["--grid-rows" as string]: String(gridRows),
+        ["--grid-gap" as string]: `${gap}px`,
+        ["--grid-inset-inline" as string]: `${insetInline}px`,
+        ["--grid-inset-block" as string]: `${insetBlock}px`,
+        ["--page-height" as string]: `${height}px`,
+        ["--tile-size" as string]: `${tile}px`,
+      } as CSSProperties);
+    };
+
+    const observer = new ResizeObserver(compute);
+    observer.observe(node);
+    compute();
+
+    return () => observer.disconnect();
+  }, []);
+
+  const cardsPerPage = gridCols * gridRows;
+  const pagedItems = useMemo(() => {
+    const pages: Array<typeof items> = [];
+    for (let index = 0; index < items.length; index += cardsPerPage) {
+      pages.push(items.slice(index, index + cardsPerPage));
+    }
+    return pages;
+  }, [cardsPerPage, items]);
+
   return (
     <main
       id="main-content"
@@ -105,27 +158,38 @@ export function PokemonExplorer() {
 
             <div className="screen-reel">
               <div className={`screen-carousel ${isDetailView ? "is-detail" : ""}`}>
-                <div ref={listPanelRef} className="screen-panel screen-panel-list">
+                <div ref={listPanelRef} style={gridStyle} className="screen-panel screen-panel-list">
                   {isInitialLoading && <PokemonListSkeleton />}
 
                   {!isLoading && !isInitialLoading && items.length === 0 && <PokemonEmptyState />}
 
                   {!isInitialLoading && items.length > 0 && (
                     <>
-                      <div className="screen-grid">
-                        {items.map((pokemon) => (
-                          <div key={pokemon.id} className="slot-item">
-                            <PokemonCard
-                              pokemon={pokemon}
-                              href={getPokemonHref(pokemon.id)}
-                              onSelect={openPokemon}
-                            />
-                          </div>
+                      <div className="screen-pages">
+                        {pagedItems.map((page, pageIndex) => (
+                          <section key={`page-${pageIndex}`} className="screen-page">
+                            <div className="screen-grid">
+                              {Array.from({ length: cardsPerPage }).map((_, cellIndex) => {
+                                const pokemon = page[cellIndex];
+                                if (!pokemon) {
+                                  return <div key={`placeholder-${pageIndex}-${cellIndex}`} className="slot-placeholder" aria-hidden="true" />;
+                                }
+                                return (
+                                  <div key={pokemon.id} className="slot-item">
+                                    <PokemonCard
+                                      pokemon={pokemon}
+                                      href={getPokemonHref(pokemon.id)}
+                                      onSelect={openPokemon}
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </section>
                         ))}
                       </div>
-                      <div className="h-8" aria-hidden="true" />
                       {isFetchingNextPage && (
-                        <p className="gba-ui-font pb-2 text-center text-[12px] text-[#3d336b]">
+                        <p className="screen-loading-more gba-ui-font text-center text-[12px] text-[#3d336b]">
                           Loading more Pokemon...
                         </p>
                       )}
@@ -176,7 +240,7 @@ export function PokemonExplorer() {
           <p className="pokemon-title gba-brand text-yellow-300">POKEDEX</p>
         </div>
       </section>
-      <div className="mt-2 flex justify-center">
+      <div className="mt-1.5 flex justify-center">
         <LanguageSwitcher />
       </div>
     </main>

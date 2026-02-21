@@ -5,6 +5,7 @@ import {
   type PokemonListItem,
   type PokemonType,
 } from "@tech-challenge/shared";
+import pLimit from "p-limit";
 import { getOrSetCache } from "../lib/cache.js";
 import { pokeApiGet } from "../lib/pokeapi-client.js";
 import { getIdFromResourceUrl, officialArtwork } from "../lib/url.js";
@@ -29,14 +30,22 @@ type PokemonIndex = {
 
 const GENERATIONS = GenerationSchema.options;
 const TYPES = PokemonTypeSchema.options;
+const INDEX_FETCH_CONCURRENCY = Math.max(
+  1,
+  Number(process.env.POKEAPI_INDEX_CONCURRENCY ?? 4),
+);
 
 export async function getPokemonIndex(): Promise<PokemonIndex> {
   return getOrSetCache("pokemon:index:v1", async () => {
+    const limit = pLimit(INDEX_FETCH_CONCURRENCY);
+
     const generationEntries = await Promise.all(
-      GENERATIONS.map(async (gen, idx) => {
-        const data = await pokeApiGet<GenerationResponse>(`/generation/${idx + 1}`);
-        return [gen, data] as const;
-      }),
+      GENERATIONS.map((gen, idx) =>
+        limit(async () => {
+          const data = await pokeApiGet<GenerationResponse>(`/generation/${idx + 1}`);
+          return [gen, data] as const;
+        }),
+      ),
     );
 
     const generationBySpeciesId = new Map<number, Generation>();
@@ -51,10 +60,12 @@ export async function getPokemonIndex(): Promise<PokemonIndex> {
     }
 
     const typeEntries = await Promise.all(
-      TYPES.map(async (type) => {
-        const data = await pokeApiGet<TypeResponse>(`/type/${type}`);
-        return [type, data] as const;
-      }),
+      TYPES.map((type) =>
+        limit(async () => {
+          const data = await pokeApiGet<TypeResponse>(`/type/${type}`);
+          return [type, data] as const;
+        }),
+      ),
     );
 
     const typesById = new Map<number, Set<PokemonType>>();

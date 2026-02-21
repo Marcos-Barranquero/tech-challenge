@@ -1,4 +1,5 @@
 import cors from "@fastify/cors";
+import pLimit from "p-limit";
 import {
   GenerationSchema,
   ListPokemonInputSchema,
@@ -25,6 +26,32 @@ const HOST = process.env.HOST ?? "0.0.0.0";
 const CACHE_WARMUP_DELAY_MS = Number(process.env.CACHE_WARMUP_DELAY_MS ?? 500);
 const CACHE_WARMUP_MODE = (process.env.CACHE_WARMUP_MODE ?? "initial").toLowerCase();
 const CACHE_WARMUP_PAGE_SIZE = Number(process.env.CACHE_WARMUP_PAGE_SIZE ?? 60);
+const CACHE_WARMUP_CONCURRENCY = Math.max(1, Number(process.env.CACHE_WARMUP_CONCURRENCY ?? 2));
+const CACHE_WARMUP_ENABLED = (process.env.CACHE_WARMUP_ENABLED ?? "true").toLowerCase() !== "false";
+
+function getAllowedCorsOrigins(): string[] {
+  const envOrigins = process.env.CORS_ORIGINS
+    ?.split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  if (envOrigins && envOrigins.length > 0) {
+    return envOrigins;
+  }
+
+  return ["http://localhost:3000", "http://127.0.0.1:3000"];
+}
+
+function createCorsOriginValidator(allowedOrigins: string[]) {
+  return (origin: string | undefined, callback: (error: Error | null, allow: boolean) => void) => {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    callback(null, allowedOrigins.includes(origin));
+  };
+}
 
 async function warmupCache(mode: "initial" | "full") {
   const pageSize = Number.isFinite(CACHE_WARMUP_PAGE_SIZE)
@@ -32,20 +59,33 @@ async function warmupCache(mode: "initial" | "full") {
     : 60;
 
   if (mode === "full") {
-    let page = 1;
-    // Preload all list pages in ascending ID order.
-    while (true) {
-      const result = await listPokemon({
-        search: "",
-        page,
-        pageSize,
-        sort: "id-asc",
-      });
-      if (!result.hasNextPage) {
-        break;
-      }
-      page += 1;
+    const firstPage = await listPokemon({
+      search: "",
+      page: 1,
+      pageSize,
+      sort: "id-asc",
+    });
+
+    if (!firstPage.hasNextPage) {
+      return;
     }
+
+    const totalPages = Math.ceil(firstPage.total / pageSize);
+    const limit = pLimit(CACHE_WARMUP_CONCURRENCY);
+    const remainingPages = Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => index + 2);
+
+    await Promise.all(
+      remainingPages.map((page) =>
+        limit(() =>
+          listPokemon({
+            search: "",
+            page,
+            pageSize,
+            sort: "id-asc",
+          }),
+        ),
+      ),
+    );
     return;
   }
 
@@ -107,9 +147,10 @@ async function bootstrap() {
   const app = Fastify({
     logger: true,
   });
+  const allowedOrigins = getAllowedCorsOrigins();
 
   await app.register(cors, {
-    origin: true,
+    origin: createCorsOriginValidator(allowedOrigins),
     credentials: true,
   });
 
@@ -208,10 +249,15 @@ async function bootstrap() {
 
   await app.listen({ port: PORT, host: HOST });
 
+  if (!CACHE_WARMUP_ENABLED) {
+    app.log.info("Cache warm-up disabled by CACHE_WARMUP_ENABLED=false");
+    return;
+  }
+
   setTimeout(() => {
     void (async () => {
       const mode = CACHE_WARMUP_MODE === "full" ? "full" : "initial";
-      app.log.info({ mode }, "Starting cache warm-up job");
+      app.log.info({ mode, concurrency: CACHE_WARMUP_CONCURRENCY }, "Starting cache warm-up job");
       const startedAt = Date.now();
       try {
         await warmupCache(mode);
