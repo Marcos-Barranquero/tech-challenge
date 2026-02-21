@@ -76,4 +76,21 @@ test.describe("Pokedex flow", () => {
     await page.locator(".screen-grid a").first().click();
     await expect(page.getByRole("button", { name: /volver/i })).toBeVisible();
   });
+
+  test("persists shell color selection across reload", async ({ page }) => {
+    await waitForCollectionReady(page);
+
+    const blueTheme = page.getByRole("button", { name: /blue shell/i });
+    await blueTheme.click();
+
+    await expect(page.locator(".gba-console")).toHaveClass(/theme-gba-blue/);
+    await page.reload();
+    await waitForCollectionReady(page);
+
+    await expect(page.locator(".gba-console")).toHaveClass(/theme-gba-blue/);
+    await expect(page.getByRole("button", { name: /blue shell/i })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
 });

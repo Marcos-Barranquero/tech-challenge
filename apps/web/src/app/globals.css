@@ -7,6 +7,66 @@
 
 :root {
   color-scheme: light;
+  --page-bg: #050608;
+  --gba-shell-border: #b8aedf;
+  --gba-shell-solid: #877ab9;
+  --gba-side-border: #b9b0df;
+  --gba-side-solid: #8a7cc0;
+  --gba-button-border: #8790a8;
+  --gba-button-top: #e2e7f3;
+  --gba-button-bottom: #b9bfd0;
+  --gba-dpad-border: #737a8c;
+  --gba-dpad-top: #d8dbe3;
+  --gba-dpad-bottom: #afb4c1;
+  --gba-start-border: #7f86a1;
+  --gba-start-top: #9ea4bd;
+  --gba-start-bottom: #8087a2;
+}
+
+.theme-gba-purple {
+  --gba-shell-border: #b8aedf;
+  --gba-shell-solid: #7f67be;
+  --gba-side-border: #b9b0df;
+  --gba-side-solid: #8d75c8;
+  --gba-button-border: #8790a8;
+  --gba-button-top: #e2e7f3;
+  --gba-button-bottom: #b9bfd0;
+}
+
+.theme-gba-red {
+  --gba-shell-border: #c48888;
+  --gba-shell-solid: #a94d4d;
+  --gba-side-border: #bd8686;
+  --gba-side-solid: #b55b5b;
+  --gba-button-border: #8a8b9e;
+  --gba-button-top: #f2e9e9;
+  --gba-button-bottom: #cab8b8;
+}
+
+.theme-gba-yellow {
+  --gba-shell-border: #c9ba79;
+  --gba-shell-solid: #c7a949;
+  --gba-side-border: #d0bf82;
+  --gba-side-solid: #c6a54d;
+  --gba-button-border: #8a896c;
+  --gba-button-top: #f4ecd1;
+  --gba-button-bottom: #d2c28f;
+  --gba-dpad-border: #80785e;
+  --gba-dpad-top: #eee4c5;
+  --gba-dpad-bottom: #c3b283;
+}
+
+.theme-gba-blue {
+  --gba-shell-border: #8da5d7;
+  --gba-shell-solid: #4a74c6;
+  --gba-side-border: #8ea5d4;
+  --gba-side-solid: #6087d5;
+  --gba-button-border: #7887a5;
+  --gba-button-top: #e3e9f7;
+  --gba-button-bottom: #b7c1da;
+  --gba-start-border: #6d7fa8;
+  --gba-start-top: #8da1cc;
+  --gba-start-bottom: #6a7ba3;
 }
 
 * {
@@ -15,13 +75,11 @@
 
 body {
   min-height: 100vh;
-  color: #0f172a;
-  background:
-    radial-gradient(circle at 12% 14%, rgba(129, 140, 248, 0.28), transparent 38%),
-    radial-gradient(circle at 88% 20%, rgba(56, 189, 248, 0.2), transparent 34%),
-    linear-gradient(120deg, #dde8ff 0%, #cfe0ff 45%, #d9e8ff 100%);
+  color: #d7def5;
+  background: var(--page-bg);
   font-family: var(--font-body), sans-serif;
   line-height: 1.6;
+  overflow: hidden;
 }
 
 h1,
@@ -64,18 +122,17 @@ h4 {
 .gba-console {
   position: relative;
   margin: 0 auto;
+  width: min(100%, 1420px);
   max-width: 1420px;
   border-radius: 68px;
-  border: 3px solid #b8aedf;
-  background:
-    radial-gradient(circle at 20% 8%, rgba(255, 255, 255, 0.35), transparent 30%),
-    radial-gradient(circle at 82% 92%, rgba(109, 40, 217, 0.32), transparent 34%),
-    linear-gradient(180deg, #968bc7 0%, #877ab9 58%, #7567ae 100%);
+  border: 3px solid var(--gba-shell-border);
+  background: var(--gba-shell-solid);
   box-shadow:
-    0 24px 60px rgba(67, 56, 202, 0.26),
+    0 24px 60px rgba(0, 0, 0, 0.48),
     inset 0 3px 0 rgba(255, 255, 255, 0.46),
     inset 0 -8px 24px rgba(49, 46, 129, 0.24);
   padding: 28px 34px 24px;
+  isolation: isolate;
 }
 
 .gba-console::before,
@@ -86,8 +143,8 @@ h4 {
   height: 56%;
   width: 84px;
   border-radius: 999px;
-  border: 3px solid #b9b0df;
-  background: linear-gradient(180deg, #9488c8, #7769ae);
+  border: 3px solid var(--gba-side-border);
+  background: var(--gba-side-solid);
   box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.34);
   z-index: -1;
 }
@@ -222,11 +279,10 @@ h4 {
 }
 
 .gba-controls {
-  position: relative;
   margin-top: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  align-items: flex-end;
   padding: 0 10px 2px;
 }
 
@@ -241,67 +297,63 @@ h4 {
   line-height: 1;
 }
 
+.gba-dpad-cluster {
+  grid-column: 2;
+  justify-self: center;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
 .gba-dpad {
   position: relative;
-  height: 54px;
-  width: 54px;
+  height: 82px;
+  width: 82px;
 }
 
 .gba-dpad span {
   position: absolute;
   border-radius: 5px;
-  border: 1px solid #737a8c;
-  background: linear-gradient(180deg, #d8dbe3, #afb4c1);
+  border: 1px solid var(--gba-dpad-border);
+  background: linear-gradient(180deg, var(--gba-dpad-top), var(--gba-dpad-bottom));
   box-shadow: inset 0 -2px 0 rgba(15, 23, 42, 0.4);
 }
 
 .gba-dpad span:first-child {
-  top: 22px;
+  top: 33px;
   left: 0;
   right: 0;
-  height: 12px;
+  height: 16px;
 }
 
 .gba-dpad span:last-child {
-  left: 22px;
+  left: 33px;
   top: 0;
   bottom: 0;
-  width: 12px;
+  width: 16px;
 }
 
 .gba-buttons {
+  grid-column: 7;
+  justify-self: center;
   display: flex;
-  gap: 10px;
+  gap: 14px;
 }
 
 .gba-buttons span {
-  height: 38px;
-  width: 38px;
+  height: 58px;
+  width: 58px;
   border-radius: 999px;
-  border: 2px solid #8790a8;
-  background: linear-gradient(180deg, #e2e7f3, #b9bfd0);
+  border: 2px solid var(--gba-button-border);
+  background: linear-gradient(180deg, var(--gba-button-top), var(--gba-button-bottom));
   box-shadow:
     inset 0 -2px 0 rgba(15, 23, 42, 0.2),
     0 2px 4px rgba(49, 46, 129, 0.22);
 }
 
-.gba-speaker {
-  position: absolute;
-  left: 60%;
-  transform: translateX(-50%) skewX(-10deg);
-  height: 40px;
-  width: 88px;
-  border-radius: 8px;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 5px, rgba(55, 65, 81, 0.85) 5px 8px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent);
-}
-
 .gba-center-brand {
-  position: absolute;
-  left: 50%;
-  bottom: 14px;
-  transform: translateX(-50%);
+  grid-column: 4 / span 2;
+  justify-self: center;
   border-radius: 999px;
   border: 2px solid #444857;
   background: linear-gradient(180deg, #303544, #1f2433);
@@ -309,6 +361,7 @@ h4 {
   padding: 10px 26px 8px;
   text-align: center;
   min-width: 300px;
+  margin-bottom: 10px;
 }
 
 .gba-center-brand small {
@@ -335,11 +388,18 @@ h4 {
 
 .gba-start-select span {
   border-radius: 999px;
-  border: 1px solid #7f86a1;
-  background: linear-gradient(180deg, #9ea4bd, #8087a2);
+  border: 1px solid var(--gba-start-border);
+  background: linear-gradient(180deg, var(--gba-start-top), var(--gba-start-bottom));
   color: #eceff8;
   font-size: 8px;
   padding: 4px 10px;
+}
+
+.gba-theme-picker-wrap {
+  position: absolute;
+  right: 34px;
+  bottom: 24px;
+  z-index: 8;
 }
 
 @keyframes reelEnter {
@@ -398,21 +458,72 @@ h4 {
 }
 
 @media (max-width: 1200px) {
+  .gba-console {
+    border-radius: 42px;
+    padding: 20px 22px 18px;
+  }
+
   .gba-screen {
-    --tile-size: clamp(132px, 16vw, 170px);
+    --tile-size: clamp(118px, 17vw, 160px);
+    --screen-pad: 14px;
+    --screen-height: min(72vh, 620px);
   }
 
   .screen-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-auto-rows: auto;
     justify-content: stretch;
   }
+
+  .screen-sticky {
+    padding: 7px;
+  }
+
+  .screen-sticky::before {
+    inset: 5px;
+  }
+
+  .gba-dpad {
+    height: 70px;
+    width: 70px;
+  }
+
+  .gba-dpad span:first-child {
+    top: 28px;
+    height: 14px;
+  }
+
+  .gba-dpad span:last-child {
+    left: 28px;
+    width: 14px;
+  }
+
+  .gba-buttons span {
+    height: 50px;
+    width: 50px;
+  }
+
+  .gba-center-brand {
+    min-width: 240px;
+    padding: 8px 18px 6px;
+    margin-bottom: 6px;
+  }
+
+  .gba-center-brand strong {
+    font-size: 18px;
+  }
+
+  .gba-theme-picker-wrap {
+    right: 18px;
+    bottom: 14px;
+  }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .gba-console {
+    width: clamp(320px, calc(100vw - 24px), 720px);
     border-radius: 32px;
-    padding: 16px;
+    padding: 12px;
   }
 
   .gba-console::before,
@@ -420,32 +531,54 @@ h4 {
     display: none;
   }
 
+  .gba-screen {
+    --tile-size: clamp(124px, 34vw, 154px);
+    --screen-pad: 10px;
+    --screen-controls-height: 40px;
+    --screen-height: min(76vh, 620px);
+  }
+
+  .gba-screen-bezel {
+    border-radius: 24px;
+    padding: 10px;
+  }
+
+  .screen-sticky {
+    padding: 6px;
+  }
+
+  .screen-sticky::before {
+    inset: 4px;
+  }
+
   .screen-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: auto;
   }
 
-  .gba-screen {
-    --screen-height: min(64vh, 560px);
+  .screen-panel-list {
+    padding: var(--screen-pad) 10px;
+  }
+
+  .screen-panel-detail {
+    padding: 8px 10px var(--screen-pad);
   }
 
   .gba-brand {
     font-size: clamp(1.45rem, 8vw, 2.4rem);
   }
 
-  .gba-center-brand {
-    min-width: 240px;
-    padding: 8px 20px 6px;
+  .gba-theme-picker-wrap {
+    right: 10px;
+    bottom: 10px;
   }
 
-  .gba-center-brand strong {
-    font-size: 18px;
+  .gba-controls {
+    display: none;
   }
-}
 
-@media (max-width: 640px) {
-  .screen-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .gba-brand-wrap {
+    margin-top: 4px;
   }
 }
 

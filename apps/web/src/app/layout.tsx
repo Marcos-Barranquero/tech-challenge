@@ -17,7 +17,12 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   title: "Pokedex",
-  description: "Pokemon explorer with filters, evolution-aware search, and detailed views."
+  description: "Pokemon explorer with filters, evolution-aware search, and detailed views.",
+  icons: {
+    icon: "/pokeball-favicon.svg",
+    shortcut: "/pokeball-favicon.svg",
+    apple: "/pokeball-favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

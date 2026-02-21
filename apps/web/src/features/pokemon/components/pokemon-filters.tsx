@@ -15,7 +15,7 @@ export function PokemonFilters() {
   const t = useTranslations("filters");
 
   return (
-    <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
       <div>
         <label htmlFor="type-filter" className="sr-only">
           {t("typeLabel")}
@@ -25,7 +25,7 @@ export function PokemonFilters() {
           name="type"
           value={selectedType ?? ""}
           onChange={(e) => setType((e.target.value || undefined) as PokemonType | undefined)}
-          className="gba-ui-font h-14 w-full cursor-pointer rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] px-4 text-[20px] text-[#1f2033] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
+          className="gba-ui-font h-10 w-full cursor-pointer rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] px-3 text-[14px] text-[#1f2033] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] sm:h-11 sm:px-3.5 sm:text-[15px] md:h-12 md:text-[16px] xl:h-14 xl:px-4 xl:text-[20px]"
         >
           <option value="">{t("typeAll")}</option>
           {data?.types.map((type) => (
@@ -45,7 +45,7 @@ export function PokemonFilters() {
           name="generation"
           value={selectedGeneration ?? ""}
           onChange={(e) => setGeneration((e.target.value || undefined) as Generation | undefined)}
-          className="gba-ui-font h-14 w-full cursor-pointer rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] px-4 text-[20px] text-[#1f2033] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
+          className="gba-ui-font h-10 w-full cursor-pointer rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] px-3 text-[14px] text-[#1f2033] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] sm:h-11 sm:px-3.5 sm:text-[15px] md:h-12 md:text-[16px] xl:h-14 xl:px-4 xl:text-[20px]"
         >
           <option value="">{t("generationAll")}</option>
           {data?.generations.map((generation) => (
@@ -59,7 +59,7 @@ export function PokemonFilters() {
       <button
         type="button"
         onClick={clearFilters}
-        className="gba-ui-font h-14 w-full cursor-pointer rounded-md border-2 border-[#4f46e5] bg-[#ece9ff] px-4 text-[20px] text-[#312e81] transition duration-200 ease-poke hover:bg-[#e4e1ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5]"
+        className="gba-ui-font h-10 w-full cursor-pointer rounded-md border-2 border-[#4f46e5] bg-[#ece9ff] px-3 text-[14px] text-[#312e81] transition duration-200 ease-poke hover:bg-[#e4e1ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] sm:h-11 sm:px-3.5 sm:text-[15px] md:h-12 md:text-[16px] xl:h-14 xl:px-4 xl:text-[20px]"
       >
         {t("clear")}
       </button>

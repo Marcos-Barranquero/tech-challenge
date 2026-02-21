@@ -49,25 +49,25 @@ export function PokemonCard({
         </div>
 
         <div className="absolute left-1.5 top-1 z-10">
-          <p className="gba-ui-font text-left text-[12px] uppercase text-[#4c3f7d]">
+          <p className="gba-ui-font text-left text-[10px] uppercase text-[#4c3f7d] sm:text-[11px] xl:text-[12px]">
             #{pokemon.id.toString().padStart(4, "0")}
           </p>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-10 p-2">
-          <h3 className="gba-ui-font gba-stroked-text mt-0.5 truncate text-center text-[18px] capitalize leading-tight">
+        <div className="absolute inset-x-0 bottom-0 z-10 p-1.5 sm:p-2">
+          <h3 className="gba-ui-font gba-stroked-text mt-0.5 truncate text-center text-[13px] capitalize leading-tight sm:text-[15px] xl:text-[18px]">
             {pokemon.name}
           </h3>
 
           <div className="mt-1 flex min-w-0 items-center justify-between gap-1.5">
-            <span className="gba-ui-font shrink-0 text-[10px] uppercase text-[#4b4d71] text-left">
+            <span className="gba-ui-font shrink-0 text-[8px] uppercase text-[#4b4d71] text-left sm:text-[9px] xl:text-[10px]">
               {pokemon.generation.replace("generation-", `${t("generationShort")} `).toUpperCase()}
             </span>
             <ul className="flex min-w-0 flex-wrap justify-end gap-1" aria-label="Pokemon types">
               {pokemon.types.map((type) => (
                 <li
                   key={type}
-                  className={`gba-ui-font rounded-sm border px-1.5 py-0.5 text-[10px] uppercase ${TYPE_BADGE[type]}`}
+                  className={`gba-ui-font rounded-sm border px-1 py-0.5 text-[8px] uppercase sm:px-1.5 sm:text-[9px] xl:text-[10px] ${TYPE_BADGE[type]}`}
                 >
                   {type}
                 </li>

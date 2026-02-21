@@ -10,8 +10,11 @@ import { PokemonInlineDetail } from "./pokemon-inline-detail";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { GbaThemePicker } from "./gba-theme-picker";
+import { useGbaThemeStore } from "@/stores/gba-theme.store";
 
 export function PokemonExplorer() {
+  const theme = useGbaThemeStore((state) => state.theme);
   const { items, isLoading, isInitialLoading, hasNextPage, isFetchingNextPage, loadMore } = usePokemonList();
   const router = useRouter();
   const pathname = usePathname();
@@ -84,13 +87,16 @@ export function PokemonExplorer() {
   }, [hasNextPage, isDetailView, isFetchingNextPage, loadMore]);
 
   return (
-    <main id="main-content" className="relative z-10 mx-auto max-w-[1500px] px-4 py-6 md:py-8">
-      <section className="gba-console" aria-live="polite">
+    <main
+      id="main-content"
+      className="relative z-10 mx-auto flex min-h-screen max-w-[1500px] flex-col items-center px-4 py-2 md:py-3"
+    >
+      <section className={`gba-console theme-gba-${theme}`} aria-live="polite">
         <div className="gba-screen-bezel">
           <div className="gba-screen">
             {!isDetailView && (
               <div className="screen-sticky">
-                <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-2">
+                <div className="grid grid-cols-1 items-center gap-2 lg:grid-cols-2">
                   <PokemonSearch />
                   <PokemonFilters />
                 </div>
@@ -143,7 +149,7 @@ export function PokemonExplorer() {
         </div>
 
         <div className="gba-controls gba-ui-font" aria-hidden="true">
-          <div className="flex items-end gap-3">
+          <div className="gba-dpad-cluster">
             <div className="gba-dpad">
               <span />
               <span />
@@ -162,12 +168,15 @@ export function PokemonExplorer() {
             <span />
           </div>
         </div>
+        <div className="gba-theme-picker-wrap">
+          <GbaThemePicker />
+        </div>
 
         <div className="gba-brand-wrap" aria-hidden="true">
           <p className="pokemon-title gba-brand text-yellow-300">POKEDEX</p>
         </div>
       </section>
-      <div className="mt-4 flex justify-center">
+      <div className="mt-2 flex justify-center">
         <LanguageSwitcher />
       </div>
     </main>
