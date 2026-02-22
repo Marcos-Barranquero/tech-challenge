@@ -24,7 +24,7 @@ read_env_value() {
   echo "${value:-}"
 }
 
-AI_MODE="ollama"
+AI_MODE="groq"
 MODEL="${OLLAMA_MODEL:-$(read_env_value OLLAMA_MODEL)}"
 MODEL="${MODEL:-qwen2:0.5b}"
 ACTION="${1:-}"
@@ -134,10 +134,11 @@ up_stack() {
     host|ollama)
       ensure_ollama_running_host
       echo "Starting stack with Ollama on host (Metal acceleration on Apple Silicon)..."
+      COMPOSE_PROFILES=ollama \
       OLLAMA_URL="http://host.docker.internal:11434" \
       OLLAMA_MODEL="$MODEL" \
       AI_PROVIDER=ollama \
-      docker compose up -d --build
+      docker compose --profile ollama up -d --build
       ;;
     groq)
       if [[ -z "$GROQ_API_KEY_VALUE" ]]; then
@@ -146,14 +147,15 @@ up_stack() {
         exit 1
       fi
       echo "Starting stack with Groq API..."
+      COMPOSE_PROFILES=groq \
       AI_PROVIDER=groq \
       GROQ_MODEL="$GROQ_MODEL_VALUE" \
       GROQ_API_KEY="$GROQ_API_KEY_VALUE" \
-      docker compose up -d --build
+      docker compose --profile groq up -d --build
       ;;
     none)
       echo "Starting stack with AI disabled..."
-      AI_PROVIDER=none docker compose up -d --build
+      COMPOSE_PROFILES=none AI_PROVIDER=none docker compose --profile none up -d --build
       ;;
     *)
       echo "Invalid --ai mode: $AI_MODE"
@@ -168,7 +170,7 @@ up_stack() {
 down_stack() {
   ensure_compose
   cd "$ROOT_DIR"
-  docker compose down --remove-orphans
+  docker compose --profile none --profile ollama --profile groq down --remove-orphans
   if [[ "$AI_MODE" == "host" || "$AI_MODE" == "ollama" ]]; then
     stop_ollama_host_if_managed
   fi
@@ -177,16 +179,16 @@ down_stack() {
 status_stack() {
   ensure_compose
   cd "$ROOT_DIR"
-  docker compose ps
+  docker compose --profile none --profile ollama --profile groq ps
 }
 
 logs_stack() {
   ensure_compose
   cd "$ROOT_DIR"
   if [[ -n "$SERVICE" ]]; then
-    docker compose logs -f "$SERVICE"
+    docker compose --profile none --profile ollama --profile groq logs -f "$SERVICE"
   else
-    docker compose logs -f
+    docker compose --profile none --profile ollama --profile groq logs -f
   fi
 }
 

@@ -79,12 +79,6 @@ function buildDeterministicFallback(context: AiPokemonContext): {
 }
 
 function buildPrompt(context: AiPokemonContext): string {
-  const topStats = [...context.stats]
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3)
-    .map((s) => `${s.name}:${s.value}`)
-    .join(", ");
-
   const languageByLocale: Record<SupportedLocale, string> = {
     en: "English",
     es: "Spanish",
@@ -94,14 +88,20 @@ function buildPrompt(context: AiPokemonContext): string {
   };
 
   return [
-    "You are a concise Pokemon analyst.",
+    "You are a concise Pokemon world-lore writer.",
     "Return ONLY valid JSON with this exact shape: {\"funFact\":\"...\"}.",
     "No markdown, no extra keys, no explanations.",
     `Write the funFact in ${languageByLocale[context.locale]}.`,
-    `Pokemon: ${context.name} (#${context.id}), ${context.generation}, types=${context.types.join("/")}, top_stats=${topStats}.`,
-    `Evolution chain members: ${context.evolutions.join(" -> ")}.`,
+    `Pokemon: ${context.name} (#${context.id}), ${context.generation}, types=${context.types.join("/")}.`,
     context.variationSeed ? `Variation seed: ${context.variationSeed}. Produce an alternative wording.` : "",
-    "funFact: exactly 2 short sentences, first sentence a concise description and second sentence a specific trivia detail tied to this pokemon or its evolution chain.",
+    "Hard constraints:",
+    "- Do NOT mention evolutions, evolution chains, or pre/evolved forms.",
+    "- Do NOT mention attacks, moves, combat strategy, battle performance, or stat values.",
+    "- Do NOT mention that information is unavailable.",
+    "Content focus:",
+    "- Physical traits or anatomy, behavior/personality, habitat/ecosystem, daily habits, or role in the Pokemon world.",
+    "- Keep it concrete and flavorful, avoiding generic filler.",
+    "funFact: exactly 2 short sentences, informative and specific.",
   ].join("\n");
 }
 

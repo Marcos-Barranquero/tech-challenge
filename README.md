@@ -64,14 +64,27 @@ Current documented release: `0.0.2`
 ### One-command helper script
 
 ```bash
-./scripts/pokedex-stack.sh up --ai ollama --model qwen2:0.5b
-./scripts/pokedex-stack.sh down --ai ollama
+./scripts/pokedex-stack.sh up --ai groq
+./scripts/pokedex-stack.sh down --ai groq
 ```
 
 Modes:
 - `--ai ollama` (`host` alias): Ollama on host (best performance on Apple Silicon with Metal), web+api in Docker.
 - `--ai groq`: Groq API provider (requires `GROQ_API_KEY` in environment or `.env`).
 - `--ai none`: disables AI generation and uses deterministic fallback.
+
+Docker Compose profiles:
+- `groq` (default),
+- `ollama`,
+- `none`.
+
+Direct Compose usage (without helper script):
+
+```bash
+docker compose --profile groq up --build
+docker compose --profile ollama up --build
+docker compose --profile none up --build
+```
 
 Groq secret setup:
 
