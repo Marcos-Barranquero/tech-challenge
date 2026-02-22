@@ -83,7 +83,7 @@ Direct Compose usage (without helper script):
 ```bash
 docker compose --profile groq up --build
 docker compose --profile ollama up --build
-docker compose --profile none up --build
+AI_PROVIDER=none docker compose --profile none up --build
 ```
 
 Groq secret setup:

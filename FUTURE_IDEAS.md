@@ -53,3 +53,10 @@
 - Map buttons for primary actions (`A` open/select, `B` back, shoulder buttons for quick navigation).
 - Add controller connection status and input hints in the UI.
 - Provide keyboard fallback and accessibility-safe behavior when no gamepad is available.
+
+## 8. Create a Demo Video
+
+- Record a short end-to-end demo (collection, filters, detail, evolutions, AI fun fact regeneration).
+- Publish one concise version for recruiters and one technical version for engineering review.
+- Include architecture callouts (BFF, caching, URL state, responsive behavior) as overlays.
+- Add the video link to `README.md` and release notes for each tagged version.

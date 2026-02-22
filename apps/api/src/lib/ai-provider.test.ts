@@ -114,4 +114,28 @@ describe("ai-provider", () => {
     expect(result.model).toBe("llama-3.1-8b-instant");
     expect(result.funFact).toContain("Pikachu");
   });
+
+  it("throws when provider is groq and GROQ_API_KEY is missing", async () => {
+    process.env.AI_PROVIDER = "groq";
+
+    await expect(generatePokemonDescription(context)).rejects.toMatchObject({
+      name: "AiProviderError",
+      message: "Missing GROQ_API_KEY",
+    });
+  });
+
+  it("throws on non-ok groq response", async () => {
+    process.env.AI_PROVIDER = "groq";
+    process.env.GROQ_API_KEY = "test-key";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("rate limited", { status: 429 })),
+    );
+
+    await expect(generatePokemonDescription(context)).rejects.toMatchObject({
+      message: "Groq request failed: 429",
+      status: 429,
+    });
+  });
 });

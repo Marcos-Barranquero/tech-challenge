@@ -27,6 +27,7 @@ read_env_value() {
 AI_MODE="groq"
 MODEL="${OLLAMA_MODEL:-$(read_env_value OLLAMA_MODEL)}"
 MODEL="${MODEL:-qwen2:0.5b}"
+MODEL_OVERRIDDEN=0
 ACTION="${1:-}"
 SERVICE="${2:-}"
 GROQ_MODEL_VALUE="${GROQ_MODEL:-$(read_env_value GROQ_MODEL)}"
@@ -47,8 +48,8 @@ Usage:
   ./scripts/pokedex-stack.sh logs [service]
 
 Examples:
-  ./scripts/pokedex-stack.sh up --ai ollama --model phi3:mini
-  ./scripts/pokedex-stack.sh up --ai groq
+  ./scripts/pokedex-stack.sh up --ai ollama --model phi3:mini   # Ollama model
+  ./scripts/pokedex-stack.sh up --ai groq --model llama-3.3-70b-versatile  # Groq model override
   ./scripts/pokedex-stack.sh down --ai ollama
   ./scripts/pokedex-stack.sh logs api
 EOF
@@ -66,6 +67,7 @@ parse_flags() {
         ;;
       --model)
         MODEL="${2:-}"
+        MODEL_OVERRIDDEN=1
         shift 2
         ;;
       --help|-h)
@@ -145,6 +147,9 @@ up_stack() {
         echo "GROQ_API_KEY is required for --ai groq."
         echo "Set it in your shell or in .env and retry."
         exit 1
+      fi
+      if [[ "$MODEL_OVERRIDDEN" -eq 1 ]]; then
+        GROQ_MODEL_VALUE="$MODEL"
       fi
       echo "Starting stack with Groq API..."
       COMPOSE_PROFILES=groq \

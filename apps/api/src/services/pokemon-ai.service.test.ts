@@ -54,10 +54,10 @@ describe("pokemon-ai.service", () => {
   });
 
   it("passes locale to ai provider context", async () => {
-    await getPokemonAIDescription({ id: 25, locale: "it", aiProvider: "groq", forceRegenerate: true });
+    await getPokemonAIDescription({ id: 25, locale: "it", forceRegenerate: true });
 
     expect(generatePokemonDescriptionMock).toHaveBeenCalledWith(
-      expect.objectContaining({ locale: "it", id: 25, name: "pikachu", requestedProvider: "groq" }),
+      expect.objectContaining({ locale: "it", id: 25, name: "pikachu" }),
     );
   });
 });

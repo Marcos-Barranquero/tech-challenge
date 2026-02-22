@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { AiProviderMode, SupportedLocale } from "@tech-challenge/shared";
+import type { SupportedLocale } from "@tech-challenge/shared";
 
 type AiPokemonContext = {
   id: number;
@@ -10,7 +10,6 @@ type AiPokemonContext = {
   stats: Array<{ name: string; value: number }>;
   evolutions: string[];
   variationSeed?: number;
-  requestedProvider?: AiProviderMode;
 };
 
 const OLLAMA_RESPONSE_SCHEMA = z.object({
@@ -64,11 +63,11 @@ function buildDeterministicFallback(context: AiPokemonContext): {
   const typeNames = context.types.join("/");
 
   const fallbackByLocale: Record<SupportedLocale, string> = {
-    en: `${displayName} is a ${typeNames} Pokemon from ${displayGeneration} and appears in an evolution chain with ${context.evolutions.length} stage(s).`,
-    es: `${displayName} es un Pokemon de tipo ${typeNames} de ${displayGeneration} y aparece en una cadena evolutiva con ${context.evolutions.length} etapa(s).`,
-    it: `${displayName} e un Pokemon di tipo ${typeNames} della ${displayGeneration} e compare in una catena evolutiva con ${context.evolutions.length} fase(i).`,
-    pt: `${displayName} e um Pokemon do tipo ${typeNames} da ${displayGeneration} e aparece em uma linha evolutiva com ${context.evolutions.length} estagio(s).`,
-    de: `${displayName} ist ein Pokemon vom Typ ${typeNames} aus ${displayGeneration} und erscheint in einer Entwicklungskette mit ${context.evolutions.length} Stufe(n).`,
+    en: `${displayName} is a ${typeNames} Pokemon from ${displayGeneration} known for its distinctive habits in the wild.`,
+    es: `${displayName} es un Pokemon de tipo ${typeNames} de ${displayGeneration}, conocido por sus habitos distintivos en estado salvaje.`,
+    it: `${displayName} e un Pokemon di tipo ${typeNames} della ${displayGeneration}, noto per le sue abitudini distintive in natura.`,
+    pt: `${displayName} e um Pokemon do tipo ${typeNames} da ${displayGeneration}, conhecido por seus habitos distintos na natureza.`,
+    de: `${displayName} ist ein Pokemon vom Typ ${typeNames} aus ${displayGeneration}, bekannt fur seine besonderen Gewohnheiten in freier Wildbahn.`,
   };
 
   return {
@@ -105,10 +104,7 @@ function buildPrompt(context: AiPokemonContext): string {
   ].join("\n");
 }
 
-function resolveProvider(context: AiPokemonContext): "none" | "ollama" | "groq" | "auto" {
-  if (context.requestedProvider) {
-    return context.requestedProvider;
-  }
+function resolveProvider(): "none" | "ollama" | "groq" | "auto" {
   const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
   if (provider === "none" || provider === "ollama" || provider === "groq" || provider === "auto") {
     return provider;
@@ -221,7 +217,7 @@ async function generateWithGroq(
         messages: [
           {
             role: "system",
-            content: "You are a concise Pokemon analyst. Return strictly JSON.",
+            content: "You are a concise Pokemon world-lore writer. Return strictly JSON.",
           },
           {
             role: "user",
@@ -260,7 +256,7 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
   provider: string;
   model: string;
 }> {
-  const provider = resolveProvider(context);
+  const provider = resolveProvider();
   const prompt = buildPrompt(context);
 
   if (provider === "none") {
