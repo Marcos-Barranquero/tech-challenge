@@ -109,6 +109,24 @@ function parseNumber(value: unknown): number | undefined {
   return undefined;
 }
 
+function parseTypeList(value: unknown): string[] | undefined {
+  if (Array.isArray(value)) {
+    const fromArray = value
+      .flatMap((entry) => (typeof entry === "string" ? entry.split(",") : []))
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+    return fromArray.length > 0 ? fromArray : undefined;
+  }
+  if (typeof value === "string") {
+    const fromCsv = value
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+    return fromCsv.length > 0 ? fromCsv : undefined;
+  }
+  return undefined;
+}
+
 function sendRouteError(reply: { code: (statusCode: number) => { send: (payload: unknown) => void } }, error: unknown): void {
   if (error instanceof ZodError) {
     reply.code(400).send({
@@ -197,6 +215,7 @@ async function bootstrap() {
       const query = request.query as Record<string, unknown>;
       const input = ListPokemonInputSchema.parse({
         search: typeof query.search === "string" ? query.search : "",
+        types: parseTypeList(query.types),
         type: typeof query.type === "string" ? query.type : undefined,
         generation: typeof query.generation === "string" ? query.generation : undefined,
         page: parseNumber(query.page) ?? 1,

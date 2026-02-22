@@ -25,36 +25,37 @@ describe("PokemonFilters", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     queryStateMock.mockReturnValue({
-      selectedType: undefined,
+      selectedTypes: [],
       selectedGeneration: undefined,
-      setType: vi.fn(),
+      setTypes: vi.fn(),
       setGeneration: vi.fn(),
       clearFilters: vi.fn(),
     });
   });
 
-  it("updates selected type and generation", async () => {
+  it("updates selected types and generation", async () => {
     const user = userEvent.setup();
-    const setType = vi.fn();
+    const setTypes = vi.fn();
     const setGeneration = vi.fn();
 
     queryStateMock.mockReturnValue({
-      selectedType: undefined,
+      selectedTypes: [],
       selectedGeneration: undefined,
-      setType,
+      setTypes,
       setGeneration,
       clearFilters: vi.fn(),
     });
 
     render(<PokemonFilters />);
 
-    const typeSelect = screen.getByRole("combobox", { name: /type/i });
+    const typeTrigger = screen.getByRole("button", { name: /type/i });
     const genSelect = screen.getByRole("combobox", { name: /generation/i });
 
-    await user.selectOptions(typeSelect, "fire");
+    await user.click(typeTrigger);
+    await user.click(screen.getByRole("option", { name: /fire/i }));
     await user.selectOptions(genSelect, "generation-ii");
 
-    expect(setType).toHaveBeenCalledWith("fire");
+    expect(setTypes).toHaveBeenCalledWith(["fire"]);
     expect(setGeneration).toHaveBeenCalledWith("generation-ii");
   });
 
@@ -63,9 +64,9 @@ describe("PokemonFilters", () => {
     const clearFilters = vi.fn();
 
     queryStateMock.mockReturnValue({
-      selectedType: "electric",
+      selectedTypes: ["electric"],
       selectedGeneration: "generation-i",
-      setType: vi.fn(),
+      setTypes: vi.fn(),
       setGeneration: vi.fn(),
       clearFilters,
     });

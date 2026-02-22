@@ -39,6 +39,7 @@ describe("usePokemonList", () => {
     queryStateMock.mockReturnValue({
       search: "",
       selectedType: undefined,
+      selectedTypes: [],
       selectedGeneration: undefined,
     });
   });
@@ -94,6 +95,7 @@ describe("usePokemonList", () => {
     queryStateMock.mockReturnValue({
       search: "chu",
       selectedType: "electric",
+      selectedTypes: ["electric"],
       selectedGeneration: undefined,
     });
 
@@ -253,6 +255,7 @@ describe("usePokemonList", () => {
     queryStateMock.mockReturnValue({
       search: "   ",
       selectedType: undefined,
+      selectedTypes: [],
       selectedGeneration: undefined,
     });
 
