@@ -28,6 +28,7 @@ export function PokemonInlineDetail({
   const aiDescriptionQuery = usePokemonAiDescription(id, locale, regenerationNonce);
   const t = useTranslations("detail");
   const tf = useTranslations("filters");
+  const formatStatLabel = (statName: string) => t(`statsNames.${statName}`);
   const formatTypeLabel = (type: PokemonType) => {
     const translated = tf(`types.${type}`);
     return translated.charAt(0).toUpperCase() + translated.slice(1);
@@ -82,12 +83,12 @@ export function PokemonInlineDetail({
 
       <div className="mt-2 grid h-auto grid-cols-1 content-start gap-2 sm:mt-3 sm:gap-3 md:grid-cols-2 lg:min-h-0 lg:flex-1 lg:grid-cols-4">
         <div className="flex min-h-0 flex-col rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1">
-          <div className="relative h-36 sm:h-40 md:h-44 lg:min-h-0 lg:flex-1">
+          <div className="relative h-36 flex-none sm:h-40 md:h-44 lg:h-52 xl:h-56">
             <Image
               src={data.image}
               alt={`${data.name} artwork`}
               fill
-              sizes="(max-width: 767px) 200px, (max-width: 1023px) 260px, 220px"
+              sizes="(max-width: 767px) 200px, (max-width: 1023px) 260px, (max-width: 1279px) 300px, 340px"
               className="object-contain p-1.5 sm:p-2"
               priority
             />
@@ -156,7 +157,7 @@ export function PokemonInlineDetail({
                     className="grid min-h-0 grid-cols-[74px_1fr_28px] items-center gap-1.5 sm:grid-cols-[90px_1fr_34px] sm:gap-2 md:grid-cols-[108px_1fr_42px]"
                   >
                     <span className="gba-ui-font text-[7px] uppercase leading-tight text-[#4b4d71] sm:text-[8px] md:text-[9px]">
-                      {stat.name}
+                      {formatStatLabel(stat.name)}
                     </span>
                     <div className="h-2.5 overflow-hidden rounded-sm border border-[#8a7fc1] bg-[#e4e1f8] sm:h-3">
                       <div className="h-full rounded-none bg-gradient-to-r from-[#5b4d91] to-[#7c6ac4]" style={{ width: `${Math.min(100, stat.value)}%` }} />

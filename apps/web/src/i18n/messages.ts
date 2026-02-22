@@ -5,6 +5,9 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     common: {
       languageSelector: "Language selector",
       shellColorSelector: "Shell color selector",
+      pokedexTitle: "POKEDEX",
+      rotateTitle: "Portrait mode only",
+      rotateBody: "Rotate your phone to portrait to continue.",
       theme: {
         purple: "Purple shell",
         red: "Red shell",
@@ -19,8 +22,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     filters: {
       typeLabel: "Type",
       generationLabel: "Generation",
-      typeAll: "Type: All",
-      generationAll: "Generation: All",
+      typeAll: "Type...",
+      generationAll: "Generation...",
       clear: "Clear",
       types: {
         normal: "normal",
@@ -61,12 +64,23 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
       stats: "Stats",
       evolutions: "Evolutions",
       generationShort: "Gen",
+      statsNames: {
+        hp: "HP",
+        attack: "Attack",
+        defense: "Defense",
+        "special-attack": "Special Attack",
+        "special-defense": "Special Defense",
+        speed: "Speed",
+      },
     },
   },
   es: {
     common: {
       languageSelector: "Selector de idioma",
       shellColorSelector: "Selector de color de carcasa",
+      pokedexTitle: "POKÉDEX",
+      rotateTitle: "Solo modo vertical",
+      rotateBody: "Gira el móvil a vertical para continuar.",
       theme: {
         purple: "Carcasa morada",
         red: "Carcasa roja",
@@ -81,8 +95,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     filters: {
       typeLabel: "Tipo",
       generationLabel: "Generacion",
-      typeAll: "Tipo: Todos",
-      generationAll: "Generacion: Todas",
+      typeAll: "Tipo...",
+      generationAll: "Generación...",
       clear: "Limpiar",
       types: {
         normal: "normal",
@@ -120,15 +134,26 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
       unavailableFunFact: "Dato curioso no disponible ahora.",
       generating: "Generando...",
       another: "Otro",
-      stats: "Estadisticas",
+      stats: "Estadísticas",
       evolutions: "Evoluciones",
       generationShort: "Gen",
+      statsNames: {
+        hp: "PS",
+        attack: "Ataque",
+        defense: "Defensa",
+        "special-attack": "Ataque Especial",
+        "special-defense": "Defensa Especial",
+        speed: "Velocidad",
+      },
     },
   },
   it: {
     common: {
       languageSelector: "Selettore lingua",
       shellColorSelector: "Selettore colore scocca",
+      pokedexTitle: "POKEDEX",
+      rotateTitle: "Solo modalità verticale",
+      rotateBody: "Ruota il telefono in verticale per continuare.",
       theme: {
         purple: "Scocca viola",
         red: "Scocca rossa",
@@ -143,8 +168,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     filters: {
       typeLabel: "Tipo",
       generationLabel: "Generazione",
-      typeAll: "Tipo: Tutti",
-      generationAll: "Generazione: Tutte",
+      typeAll: "Tipo...",
+      generationAll: "Generazione...",
       clear: "Pulisci",
       types: {
         normal: "normale",
@@ -173,24 +198,35 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     },
     detail: {
       back: "Indietro",
-      funFact: "Curiosita",
+      funFact: "Curiosità",
       aiProviderLabel: "Provider IA",
       aiProviderNone: "Senza IA",
       aiProviderOllama: "Ollama Locale",
       aiProviderGroq: "API Groq",
-      loadingFunFact: "Caricamento curiosita IA...",
-      unavailableFunFact: "Curiosita non disponibile ora.",
+      loadingFunFact: "Caricamento curiosità IA...",
+      unavailableFunFact: "Curiosità non disponibile ora.",
       generating: "Generazione...",
       another: "Un altro",
       stats: "Statistiche",
       evolutions: "Evoluzioni",
       generationShort: "Gen",
+      statsNames: {
+        hp: "PS",
+        attack: "Attacco",
+        defense: "Difesa",
+        "special-attack": "Attacco Speciale",
+        "special-defense": "Difesa Speciale",
+        speed: "Velocità",
+      },
     },
   },
   pt: {
     common: {
       languageSelector: "Seletor de idioma",
       shellColorSelector: "Seletor de cor da carcaça",
+      pokedexTitle: "POKEDEX",
+      rotateTitle: "Apenas modo retrato",
+      rotateBody: "Gire o celular para o modo retrato para continuar.",
       theme: {
         purple: "Carcaça roxa",
         red: "Carcaça vermelha",
@@ -205,8 +241,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     filters: {
       typeLabel: "Tipo",
       generationLabel: "Geracao",
-      typeAll: "Tipo: Todos",
-      generationAll: "Geracao: Todas",
+      typeAll: "Tipo...",
+      generationAll: "Geração...",
       clear: "Limpar",
       types: {
         normal: "normal",
@@ -241,18 +277,29 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
       aiProviderOllama: "Ollama Local",
       aiProviderGroq: "API Groq",
       loadingFunFact: "Carregando curiosidade com IA...",
-      unavailableFunFact: "Curiosidade indisponivel agora.",
+      unavailableFunFact: "Curiosidade indisponível agora.",
       generating: "Gerando...",
       another: "Outra",
-      stats: "Estatisticas",
-      evolutions: "Evolucoes",
+      stats: "Estatísticas",
+      evolutions: "Evoluções",
       generationShort: "Gen",
+      statsNames: {
+        hp: "PS",
+        attack: "Ataque",
+        defense: "Defesa",
+        "special-attack": "Ataque Especial",
+        "special-defense": "Defesa Especial",
+        speed: "Velocidade",
+      },
     },
   },
   de: {
     common: {
       languageSelector: "Sprachauswahl",
       shellColorSelector: "Gehausefarbwahl",
+      pokedexTitle: "POKEDEX",
+      rotateTitle: "Nur Hochformat",
+      rotateBody: "Drehe dein Handy ins Hochformat, um fortzufahren.",
       theme: {
         purple: "Lila Gehause",
         red: "Rotes Gehause",
@@ -267,8 +314,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     filters: {
       typeLabel: "Typ",
       generationLabel: "Generation",
-      typeAll: "Typ: Alle",
-      generationAll: "Generation: Alle",
+      typeAll: "Typ...",
+      generationAll: "Generation...",
       clear: "Leeren",
       types: {
         normal: "normal",
@@ -296,19 +343,27 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
       subtitle: "Versuche einen anderen Namen oder passe die Filter an.",
     },
     detail: {
-      back: "Zuruck",
+      back: "Zurück",
       funFact: "Fun Fact",
       aiProviderLabel: "KI-Anbieter",
       aiProviderNone: "Ohne KI",
       aiProviderOllama: "Lokales Ollama",
       aiProviderGroq: "Groq API",
       loadingFunFact: "KI-Fun-Fact wird geladen...",
-      unavailableFunFact: "Fun Fact ist gerade nicht verfugbar.",
+      unavailableFunFact: "Fun Fact ist gerade nicht verfügbar.",
       generating: "Wird erzeugt...",
       another: "Noch einer",
       stats: "Stats",
       evolutions: "Entwicklungen",
       generationShort: "Gen",
+      statsNames: {
+        hp: "KP",
+        attack: "Angriff",
+        defense: "Verteidigung",
+        "special-attack": "Spezial-Angriff",
+        "special-defense": "Spezial-Verteidigung",
+        speed: "Initiative",
+      },
     },
   },
 };

@@ -82,6 +82,10 @@ body {
   overflow: hidden;
 }
 
+.mobile-landscape-lock {
+  display: none;
+}
+
 h1,
 h2,
 h3,
@@ -563,10 +567,15 @@ h4 {
 }
 
 @media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .gba-console {
-    width: clamp(320px, calc(100vw - 24px), 720px);
+    width: clamp(300px, calc(100vw - 20px), 640px);
     border-radius: 32px;
-    padding: 12px;
+    padding: 10px;
   }
 
   .gba-console::before,
@@ -575,9 +584,9 @@ h4 {
   }
 
   .gba-screen {
-    --tile-size: clamp(124px, 34vw, 154px);
+    --tile-size: clamp(116px, 33vw, 148px);
     --screen-pad: 10px;
-    --screen-height: min(76vh, 620px);
+    --screen-height: min(67dvh, 560px);
   }
 
   .gba-screen-bezel {
@@ -597,7 +606,13 @@ h4 {
     --grid-cols: 2;
     --grid-gap: 8px;
     --grid-inset-inline: 14px;
-    --grid-inset-block: 12px;
+    --grid-inset-block: 8px;
+  }
+
+  .screen-page {
+    align-items: flex-start;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .screen-panel-detail {
@@ -609,8 +624,7 @@ h4 {
   }
 
   .gba-theme-picker-wrap {
-    right: 10px;
-    bottom: 10px;
+    display: none;
   }
 
   .gba-controls {
@@ -618,7 +632,34 @@ h4 {
   }
 
   .gba-brand-wrap {
-    margin-top: 4px;
+    margin-top: 2px;
+  }
+
+  .mobile-landscape-lock {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  body {
+    overflow: hidden;
+  }
+
+  .app-shell {
+    display: none !important;
+  }
+
+  .mobile-landscape-lock {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: #06070d;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
   }
 }
 

@@ -37,6 +37,9 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
   common: {
     languageSelector: "Language selector",
     shellColorSelector: "Shell color selector",
+    pokedexTitle: "POKEDEX",
+    rotateTitle: "Portrait mode only",
+    rotateBody: "Rotate your phone to portrait to continue.",
     "theme.purple": "Purple shell",
     "theme.red": "Red shell",
     "theme.yellow": "Yellow shell",
@@ -49,8 +52,8 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
   filters: {
     typeLabel: "Type",
     generationLabel: "Generation",
-    typeAll: "Type: All",
-    generationAll: "Generation: All",
+    typeAll: "Type...",
+    generationAll: "Generation...",
     clear: "Clear",
   },
   empty: {
@@ -71,6 +74,12 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
     stats: "Stats",
     evolutions: "Evolutions",
     generationShort: "Gen",
+    "statsNames.hp": "HP",
+    "statsNames.attack": "Attack",
+    "statsNames.defense": "Defense",
+    "statsNames.special-attack": "Special Attack",
+    "statsNames.special-defense": "Special Defense",
+    "statsNames.speed": "Speed",
   },
 };
 

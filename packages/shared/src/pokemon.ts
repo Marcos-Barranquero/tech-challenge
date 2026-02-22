@@ -139,7 +139,7 @@ export const PokemonAIDescriptionInputSchema = z.object({
 export const PokemonAIDescriptionOutputSchema = z.object({
   id: z.number().int().positive(),
   name: z.string(),
-  funFact: z.string().min(1).max(300),
+  funFact: z.string().min(1).max(200),
   provider: z.string(),
   model: z.string(),
   generatedAt: z.string(),

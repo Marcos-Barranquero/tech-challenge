@@ -13,9 +13,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { GbaThemePicker } from "./gba-theme-picker";
 import { useGbaThemeStore } from "@/stores/gba-theme.store";
+import { useTranslations } from "next-intl";
 
 export function PokemonExplorer() {
   const theme = useGbaThemeStore((state) => state.theme);
+  const tCommon = useTranslations("common");
   const { items, isLoading, isInitialLoading, hasNextPage, isFetchingNextPage, loadMore } = usePokemonList();
   const router = useRouter();
   const pathname = usePathname();
@@ -140,11 +142,17 @@ export function PokemonExplorer() {
   }, [cardsPerPage, items]);
 
   return (
-    <main
-      id="main-content"
-      className="relative z-10 mx-auto flex min-h-screen max-w-[1500px] flex-col items-center px-4 py-2 md:py-3"
-    >
-      <section className={`gba-console theme-gba-${theme}`} aria-live="polite">
+    <>
+      <div className="mobile-landscape-lock" role="status" aria-live="polite">
+        <p className="gba-ui-font text-[14px] text-[#f8f9ff]">{tCommon("rotateTitle")}</p>
+        <p className="mt-2 text-[13px] text-[#d9dbff]">{tCommon("rotateBody")}</p>
+      </div>
+
+      <main
+        id="main-content"
+        className="app-shell relative z-10 mx-auto flex min-h-screen max-w-[1500px] flex-col items-center px-4 py-2 md:py-3"
+      >
+        <section className={`gba-console theme-gba-${theme}`} aria-live="polite">
         <div className="gba-screen-bezel">
           <div className="gba-screen">
             {!isDetailView && (
@@ -237,12 +245,13 @@ export function PokemonExplorer() {
         </div>
 
         <div className="gba-brand-wrap" aria-hidden="true">
-          <p className="pokemon-title gba-brand text-yellow-300">POKEDEX</p>
+          <p className="pokemon-title gba-brand text-yellow-300">{tCommon("pokedexTitle")}</p>
         </div>
-      </section>
-      <div className="mt-1.5 flex justify-center">
-        <LanguageSwitcher />
-      </div>
-    </main>
+        </section>
+        <div className="mt-1.5 flex justify-center">
+          <LanguageSwitcher />
+        </div>
+      </main>
+    </>
   );
 }
