@@ -5,6 +5,47 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.10] - 2026-02-23
+
+### Added
+
+- Multi-type filtering support in the UI with an accessible custom dropdown:
+  - checkbox-based type selection,
+  - selection counter in trigger label,
+  - click-outside and `Escape` close behavior,
+  - clear action inside the dropdown.
+- New URL-state support for multi-type filters via `types` query param (comma-separated).
+- Full-screen empty-state experience inside the GBA display:
+  - larger typographic hierarchy,
+  - themed status icon and panel styling,
+  - direct action button to reset search and filters.
+- New localized empty-state copy keys (`hint`, `cta`) across all supported locales.
+- Mobile landscape lock overlay with localized messaging to enforce portrait usage on phones.
+
+### Changed
+
+- Type filter logic is now restrictive (intersection / `AND`):
+  - selecting multiple types returns only Pokemon that contain all selected types.
+- BFF list filtering updated to prioritize `types[]` while preserving temporary backward compatibility with legacy `type`.
+- REST list endpoint now supports `types` input parsing (CSV and array forms).
+- Detail artwork panel now uses fixed sizing across loading/regeneration states to remove visual bouncing.
+- AI fun-fact generation constraints tightened:
+  - prompt now explicitly caps output length,
+  - output schema max length reduced to 200 characters.
+- Mobile layout tuning for better fit:
+  - reduced GBA/screen vertical footprint in portrait,
+  - improved spacing behavior in the grid page region,
+  - hidden shell color picker on mobile viewports.
+- Pokedex title now localizes by language (Spanish uses `POKÉDEX`).
+- Detail stat labels are now localized by language (instead of raw API keys).
+- Filter placeholder labels simplified in all locales (`Type...`, `Tipo...`, etc.) to avoid truncation.
+- GBA screen catalog background replaced with Pokemon map artwork (`/pokemon-map.png`) instead of the previous flat tri-color gradient.
+
+### Fixed
+
+- API TypeScript build failure in strict/Docker environments caused by overly broad intermediate typing in multi-type filter resolution.
+- Spanish detail copy typo corrected (`Estadísticas` with accent).
+
 ## [0.0.9] - 2026-02-22
 
 ### Added

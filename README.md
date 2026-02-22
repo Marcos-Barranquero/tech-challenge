@@ -1,84 +1,83 @@
 # Pokedex
 
-A Pokemon explorer built with TypeScript and Next.js, focused on clean architecture, end-to-end type safety, and responsive UX.
+## Overview
+Pokedex is a responsive Pokemon explorer built as a TypeScript monorepo with a dedicated Backend-for-Frontend.
+The web app renders a Game Boy Advance-inspired interface with fast list navigation, inline detail views, and evolution-aware search.
+All Pokemon data is brokered through a typed API layer (tRPC + Zod), with caching and warm-up strategies to reduce latency.
+The project supports AI-generated fun facts with three runtime modes: disabled, local Ollama, or Groq API.
+The architecture is deployment-ready with Docker, Compose profiles, and environment-driven runtime configuration.
 
-Current documented release: `0.0.2`
+## Architecture (High Level)
 
-## What It Includes
+```mermaid
+flowchart LR
+  U["User Browser"] --> W["Next.js Web App (App Router)"]
+  W --> T["tRPC Client"]
+  T --> B["Fastify BFF (/trpc)"]
+  B --> S["Service Layer (Pokemon, Evolution, AI)"]
+  S --> C["LRU Cache + Warmup"]
+  S --> P["PokeAPI"]
+  S --> A["AI Provider Adapter"]
+  A --> O["Ollama (optional)"]
+  A --> G["Groq API (optional)"]
+  B --> R["REST v1 + OpenAPI/Swagger"]
+```
 
-- Main list sorted by ID.
-- Per-item data in the list:
-  - name,
-  - generation,
-  - types.
-- Combined filters by type and generation.
-- Real-time name search that expands to the full evolution chain.
-- In-screen Pokemon detail view (SPA behavior with dynamic query-string URL, no full page reload) with:
-  - name,
-  - image,
-  - generation,
-  - types,
-  - stats,
-  - clickable evolutions with clear current-item highlighting,
-  - back button that returns to the collection grid.
-- Navigation state is preserved when moving between collection and detail inside the screen.
-- Full page reload resets that client state.
-- Game Boy Advance-inspired floating shell UI with collection and detail rendered inside the same screen frame.
-
-## Stack
+### Stack
 
 | Layer | Technology |
 |---|---|
-| Web | Next.js, React, Tailwind CSS, Zustand |
-| BFF | Fastify, tRPC, Zod, LRU Cache |
-| Contracts | `packages/shared` (TypeScript + Zod) |
-| Infrastructure | Multi-stage Docker + Docker Compose |
+| Web | Next.js, React, Tailwind CSS, Zustand, next-intl |
+| BFF | Fastify, tRPC, Zod, LRU cache |
+| Shared contracts | `packages/shared` (TypeScript + Zod) |
+| Infra | Docker multi-stage builds + Docker Compose profiles |
 
-## Key Technical Decisions
+## Product Capabilities (Client-Facing Milestones)
 
-- The client never calls PokeAPI directly; all access goes through the BFF (`tRPC`).
-- Input/output contracts are validated with `Zod`.
-- N+1 is avoided on list flows via an aggregated, cached backend index.
-- Evolution-chain resolution is cached by `evolution-chain` ID.
-- API startup triggers non-blocking cache warm-up to reduce first-interaction latency.
-- UI resilience includes loading states, error boundaries, and toast feedback.
-- Collection-to-detail interaction is implemented as an in-place SPA flow for fast context-preserving navigation.
+- GBA-style responsive UX for desktop, tablet, and mobile.
+- Real-time Pokemon exploration with list sorted by ID.
+- Multi-filter support by generation and multi-type intersection.
+- Evolution-aware live search (matching chain members, not only direct name hits).
+- Inline detail mode inside the same screen with stats, evolutions, and AI fun facts.
+- Multi-language interface (EN, ES, IT, PT, DE) with localized labels and detail content.
+- Theme personalization with multiple GBA shell colors and persisted preferences.
+- Local-first/Cloud AI runtime options:
+  - deterministic fallback (no AI),
+  - host Ollama integration,
+  - Groq API integration.
+- URL-based state persistence for filters/search during navigation.
+- End-to-end typed contracts across frontend, BFF, and shared schemas.
 
-## Project Structure
+## Run Instructions
 
-```text
-.
-├─ apps/
-│  ├─ web/                 # Next.js frontend
-│  └─ api/                 # tRPC BFF backend
-├─ packages/
-│  └─ shared/              # Shared schemas and types
-├─ Dockerfile.web
-├─ Dockerfile.api
-├─ docker-compose.yml
-└─ CHANGELOG.md
-```
+### 1) Prerequisites
 
-## Run Locally
+- Docker + Docker Compose
+- Optional for host AI mode: [Ollama](https://ollama.com/download)
+- Optional for Groq mode: `GROQ_API_KEY`
 
-### One-command helper script
+### 2) Environment Setup
 
 ```bash
-./scripts/pokedex-stack.sh up --ai groq
-./scripts/pokedex-stack.sh down --ai groq
+cp .env.example .env
 ```
 
-Modes:
-- `--ai ollama` (`host` alias): Ollama on host (best performance on Apple Silicon with Metal), web+api in Docker.
-- `--ai groq`: Groq API provider (requires `GROQ_API_KEY` in environment or `.env`).
-- `--ai none`: disables AI generation and uses deterministic fallback.
+Set secrets when needed:
 
-Docker Compose profiles:
-- `groq` (default),
-- `ollama`,
-- `none`.
+```bash
+# only required for Groq mode
+GROQ_API_KEY=your_secret_here
+```
 
-Direct Compose usage (without helper script):
+### 3) Docker Compose Profiles
+
+Profile behavior:
+
+- `groq` (default): API uses Groq provider.
+- `ollama`: API targets Ollama endpoint.
+- `none`: AI disabled, deterministic fallback.
+
+Run with explicit profiles:
 
 ```bash
 docker compose --profile groq up --build
@@ -86,101 +85,52 @@ docker compose --profile ollama up --build
 AI_PROVIDER=none docker compose --profile none up --build
 ```
 
-Groq secret setup:
-
-```bash
-cp .env.example .env
-# edit .env and set GROQ_API_KEY=<your-secret>
-./scripts/pokedex-stack.sh up --ai groq
-```
-
-Never expose `GROQ_API_KEY` as `NEXT_PUBLIC_*`; it must stay server-side only.
-
-### With Docker (recommended)
+Default run (uses `.env` defaults, usually `groq`):
 
 ```bash
 docker compose up --build
 ```
 
-- Web: `http://localhost:3000`
-- API health: `http://localhost:4000/health`
+### 4) Helper Script (Recommended)
 
-### Development mode
+Start/stop via unified script:
 
 ```bash
-pnpm install
-pnpm dev
+./scripts/pokedex-stack.sh up --ai groq
+./scripts/pokedex-stack.sh up --ai ollama
+./scripts/pokedex-stack.sh up --ai none
+./scripts/pokedex-stack.sh down --ai groq
 ```
 
-## tRPC Procedures
+#### Ollama Script Modes
 
-- `pokemon.list`
-- `pokemon.detail`
-- `pokemon.searchWithEvolutions`
-- `pokemon.meta`
+- `--ai ollama` (or `--ai host`) starts stack configured for host Ollama.
+- `--model` sets Ollama model in Ollama mode.
 
-## Versioned REST + OpenAPI Contract
+Examples:
 
-- OpenAPI JSON: `http://localhost:4000/openapi/v1.json`
+```bash
+./scripts/pokedex-stack.sh up --ai ollama --model phi3:mini
+./scripts/pokedex-stack.sh up --ai host --model qwen2:0.5b
+```
+
+### 5) URLs
+
+- Web: `http://localhost:3000`
+- API health: `http://localhost:4000/health`
+- OpenAPI: `http://localhost:4000/openapi/v1.json`
 - Swagger UI: `http://localhost:4000/docs`
-- Versioned REST endpoints (`v1`):
-  - `GET /v1/pokemon`
-  - `GET /v1/pokemon/{id}`
-  - `GET /v1/pokemon/search/evolutions`
-  - `GET /v1/pokemon/meta`
-
-The contract is generated from shared Zod schemas in `packages/shared` (single source of truth).
-
-## API Architecture (tRPC + REST)
-
-```mermaid
-flowchart LR
-  A["Next.js Web App"] --> B["tRPC Client"]
-  B --> C["/trpc (Fastify adapter)"]
-  R["External REST Client"] --> D["/v1/* REST routes"]
-  D --> E["Zod validation (shared schemas)"]
-  C --> E
-  E --> F["Service layer (pokemon.service, evolution.service, index service)"]
-  F --> G["Cache layer (LRU)"]
-  F --> H["PokeAPI"]
-  D --> I["OpenAPI v1 (/openapi/v1.json)"]
-  I --> J["Swagger UI (/docs)"]
-```
-
-- The frontend uses `tRPC` by default.
-- REST `v1` is available for external integrations and contract-first documentation.
-- Both entrypoints share the same business logic and schema contracts.
 
 ## Testing
-
-### Unit + Integration (web + api)
 
 ```bash
 pnpm test
 pnpm test:coverage
-```
-
-### E2E (Playwright)
-
-```bash
-pnpm exec playwright install chromium
 pnpm test:e2e
 pnpm test:a11y
-```
-
-### Performance Smoke
-
-```bash
 pnpm test:perf:smoke
 ```
 
 ## Changelog
 
-See `CHANGELOG.md` for release history.
-
-## Dependency Maintenance
-
-- Dependabot is configured in `.github/dependabot.yml` for:
-  - npm/pnpm workspace dependencies,
-  - GitHub Actions,
-  - Docker images.
+See `/CHANGELOG.md` for release history.

@@ -246,10 +246,11 @@ h4 {
   --grid-inset-block: 16px;
   --tile-size: 120px;
   background:
-    radial-gradient(circle at 12% 24%, rgba(128, 206, 136, 0.34), transparent 28%),
-    radial-gradient(circle at 78% 62%, rgba(252, 211, 77, 0.22), transparent 34%),
-    radial-gradient(circle at 88% 24%, rgba(147, 197, 253, 0.36), transparent 24%),
-    linear-gradient(135deg, #9dd77f 0 33%, #d8cb73 33% 64%, #79b8e8 64% 100%);
+    linear-gradient(180deg, rgba(235, 244, 255, 0.2), rgba(216, 230, 255, 0.1)),
+    url("/pokemon-map.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .screen-panel-list::-webkit-scrollbar {
