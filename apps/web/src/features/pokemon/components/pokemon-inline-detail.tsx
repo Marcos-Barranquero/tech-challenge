@@ -63,7 +63,7 @@ export function PokemonInlineDetail({
   return (
     <section
       key={transitionKey}
-      className={`flex h-full min-h-0 w-full flex-col overflow-hidden rounded-lg border-2 border-[#5f518f] bg-[#f4f1ff]/95 p-2 shadow-[0_5px_0_#4e3f82,0_12px_22px_rgba(37,30,77,0.2)] sm:p-3 md:p-4 ${
+      className={`flex h-auto w-full flex-none flex-col overflow-visible rounded-lg border-2 border-[#5f518f] bg-[#f4f1ff]/95 p-2 shadow-[0_5px_0_#4e3f82,0_12px_22px_rgba(37,30,77,0.2)] sm:p-3 md:p-4 lg:h-full lg:min-h-0 lg:flex-1 lg:overflow-hidden ${
         transitionDirection === "up"
           ? "detail-reel-up"
           : transitionDirection === "down"
@@ -80,9 +80,9 @@ export function PokemonInlineDetail({
         {t("back")}
       </button>
 
-      <div className="mt-2 grid min-h-0 flex-1 grid-cols-1 gap-2 sm:mt-3 sm:gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-2 grid h-auto grid-cols-1 content-start gap-2 sm:mt-3 sm:gap-3 md:grid-cols-2 lg:min-h-0 lg:flex-1 lg:grid-cols-4">
         <div className="flex min-h-0 flex-col rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-1">
-          <div className="relative h-36 sm:h-44 md:h-52 lg:min-h-0 lg:flex-1">
+          <div className="relative h-36 sm:h-40 md:h-44 lg:min-h-0 lg:flex-1">
             <Image
               src={data.image}
               alt={`${data.name} artwork`}
@@ -118,7 +118,7 @@ export function PokemonInlineDetail({
 
         <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-2 lg:flex lg:flex-col">
           <div className="flex min-h-0 flex-col gap-2 sm:gap-3 lg:flex-1">
-            <section className="flex min-h-[150px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[170px] sm:p-2.5 lg:min-h-0">
+            <section className="flex min-h-[130px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[145px] sm:p-2.5 lg:min-h-0">
               <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
                 {t("funFact")}
               </h3>
@@ -145,7 +145,7 @@ export function PokemonInlineDetail({
               </div>
             </section>
 
-            <section className="flex min-h-[170px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[190px] sm:p-2.5 lg:min-h-0">
+            <section className="flex min-h-[145px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[165px] sm:p-2.5 lg:min-h-0">
               <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
                 {t("stats")}
               </h3>
@@ -175,7 +175,7 @@ export function PokemonInlineDetail({
           <h3 className="gba-ui-font text-[15px] uppercase text-[#1f2033] sm:text-[18px] md:text-[20px] lg:text-[22px]">
             {t("evolutions")}
           </h3>
-          <ul className="mt-2 flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 sm:mt-3 sm:max-h-[280px] md:max-h-[340px] lg:min-h-0 lg:flex-1 lg:max-h-none">
+          <ul className="mt-2 flex max-h-[220px] flex-col gap-2 overflow-y-auto pr-1 sm:mt-3 sm:max-h-[260px] md:max-h-[280px] lg:min-h-0 lg:flex-1 lg:max-h-none">
             {data.evolutions.map((evo) => (
               <li key={evo.id}>
                 <Link

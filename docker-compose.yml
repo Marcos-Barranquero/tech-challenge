@@ -1,16 +1,19 @@
 services:
   api:
+    profiles: ["none", "ollama", "groq"]
     build:
       context: .
       dockerfile: Dockerfile.api
-    container_name: tech-challenge-api
     environment:
       NODE_ENV: production
       PORT: 4000
       HOST: 0.0.0.0
-      AI_PROVIDER: ${AI_PROVIDER:-auto}
+      AI_PROVIDER: ${AI_PROVIDER:-groq}
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2:0.5b}
+      GROQ_URL: ${GROQ_URL:-https://api.groq.com/openai/v1/chat/completions}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.1-8b-instant}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
       AI_REQUEST_TIMEOUT_MS: ${AI_REQUEST_TIMEOUT_MS:-90000}
       CACHE_WARMUP_MODE: ${CACHE_WARMUP_MODE:-initial}
       CACHE_WARMUP_PAGE_SIZE: ${CACHE_WARMUP_PAGE_SIZE:-60}
@@ -24,12 +27,12 @@ services:
       start_period: 15s
 
   web:
+    profiles: ["none", "ollama", "groq"]
     build:
       context: .
       dockerfile: Dockerfile.web
       args:
         NEXT_PUBLIC_API_URL: http://localhost:4000
-    container_name: tech-challenge-web
     environment:
       NODE_ENV: production
       PORT: 3000

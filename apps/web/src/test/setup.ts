@@ -60,6 +60,10 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
   detail: {
     back: "Back",
     funFact: "Fun Fact",
+    aiProviderLabel: "AI provider",
+    aiProviderNone: "No AI",
+    aiProviderOllama: "Ollama Local",
+    aiProviderGroq: "Groq API",
     loadingFunFact: "Loading AI fun fact...",
     unavailableFunFact: "AI fun fact unavailable right now.",
     generating: "Generating...",

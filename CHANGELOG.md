@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.9] - 2026-02-22
+
+### Added
+
+- Groq provider support for AI fun-fact generation in the BFF.
+- New server-side environment variables for Groq:
+  - `GROQ_API_KEY` (secret),
+  - `GROQ_MODEL`,
+  - `GROQ_URL`.
+- Docker Compose profile model for AI runtime selection:
+  - `none`,
+  - `ollama`,
+  - `groq` (default).
+- Launcher support for explicit AI modes:
+  - `./scripts/pokedex-stack.sh up --ai none`,
+  - `./scripts/pokedex-stack.sh up --ai ollama` (`host` alias),
+  - `./scripts/pokedex-stack.sh up --ai groq`.
+- API and web test coverage updates for Groq and new runtime behavior.
+
+### Changed
+
+- AI provider selection moved to backend/runtime configuration for production-safe operation.
+- `docker compose up --build` now runs with `groq` by default via `COMPOSE_PROFILES=groq`.
+- AI description cache keys now include provider/model dimensions to avoid cross-provider collisions.
+- Prompt design unified into a single source of truth for Ollama and Groq.
+- Shared prompt intent updated to focus on lore-style fun facts:
+  - no evolutions,
+  - no attacks/moves/stats,
+  - focus on anatomy, behavior, habitat, and world context.
+- Documentation updated for secure Groq setup and profile-based startup.
+
+### Fixed
+
+- Launcher now reads `.env` values for AI settings when they are not exported in shell.
+- Removed frontend AI provider selector from detail view; provider choice is now fully environment/script-driven.
+
 ## [0.0.8] - 2026-02-21
 
 ### Changed

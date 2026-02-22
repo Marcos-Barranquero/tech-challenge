@@ -16,6 +16,16 @@ const OLLAMA_RESPONSE_SCHEMA = z.object({
   response: z.string(),
 });
 
+const GROQ_RESPONSE_SCHEMA = z.object({
+  choices: z.array(
+    z.object({
+      message: z.object({
+        content: z.string(),
+      }),
+    }),
+  ).min(1),
+});
+
 const AI_DESCRIPTION_SCHEMA = z.object({
   funFact: z.string().min(1).max(300),
 });
@@ -53,11 +63,11 @@ function buildDeterministicFallback(context: AiPokemonContext): {
   const typeNames = context.types.join("/");
 
   const fallbackByLocale: Record<SupportedLocale, string> = {
-    en: `${displayName} is a ${typeNames} Pokemon from ${displayGeneration} and appears in an evolution chain with ${context.evolutions.length} stage(s).`,
-    es: `${displayName} es un Pokemon de tipo ${typeNames} de ${displayGeneration} y aparece en una cadena evolutiva con ${context.evolutions.length} etapa(s).`,
-    it: `${displayName} e un Pokemon di tipo ${typeNames} della ${displayGeneration} e compare in una catena evolutiva con ${context.evolutions.length} fase(i).`,
-    pt: `${displayName} e um Pokemon do tipo ${typeNames} da ${displayGeneration} e aparece em uma linha evolutiva com ${context.evolutions.length} estagio(s).`,
-    de: `${displayName} ist ein Pokemon vom Typ ${typeNames} aus ${displayGeneration} und erscheint in einer Entwicklungskette mit ${context.evolutions.length} Stufe(n).`,
+    en: `${displayName} is a ${typeNames} Pokemon from ${displayGeneration} known for its distinctive habits in the wild.`,
+    es: `${displayName} es un Pokemon de tipo ${typeNames} de ${displayGeneration}, conocido por sus habitos distintivos en estado salvaje.`,
+    it: `${displayName} e un Pokemon di tipo ${typeNames} della ${displayGeneration}, noto per le sue abitudini distintive in natura.`,
+    pt: `${displayName} e um Pokemon do tipo ${typeNames} da ${displayGeneration}, conhecido por seus habitos distintos na natureza.`,
+    de: `${displayName} ist ein Pokemon vom Typ ${typeNames} aus ${displayGeneration}, bekannt fur seine besonderen Gewohnheiten in freier Wildbahn.`,
   };
 
   return {
@@ -68,12 +78,6 @@ function buildDeterministicFallback(context: AiPokemonContext): {
 }
 
 function buildPrompt(context: AiPokemonContext): string {
-  const topStats = [...context.stats]
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 3)
-    .map((s) => `${s.name}:${s.value}`)
-    .join(", ");
-
   const languageByLocale: Record<SupportedLocale, string> = {
     en: "English",
     es: "Spanish",
@@ -83,28 +87,36 @@ function buildPrompt(context: AiPokemonContext): string {
   };
 
   return [
-    "You are a concise Pokemon analyst.",
+    "You are a concise Pokemon world-lore writer.",
     "Return ONLY valid JSON with this exact shape: {\"funFact\":\"...\"}.",
     "No markdown, no extra keys, no explanations.",
     `Write the funFact in ${languageByLocale[context.locale]}.`,
-    `Pokemon: ${context.name} (#${context.id}), ${context.generation}, types=${context.types.join("/")}, top_stats=${topStats}.`,
-    `Evolution chain members: ${context.evolutions.join(" -> ")}.`,
+    `Pokemon: ${context.name} (#${context.id}), ${context.generation}, types=${context.types.join("/")}.`,
     context.variationSeed ? `Variation seed: ${context.variationSeed}. Produce an alternative wording.` : "",
-    "funFact: exactly 2 short sentences, first sentence a concise description and second sentence a specific trivia detail tied to this pokemon or its evolution chain.",
+    "Hard constraints:",
+    "- Do NOT mention evolutions, evolution chains, or pre/evolved forms.",
+    "- Do NOT mention attacks, moves, combat strategy, battle performance, or stat values.",
+    "- Do NOT mention that information is unavailable.",
+    "Content focus:",
+    "- Physical traits or anatomy, behavior/personality, habitat/ecosystem, daily habits, or role in the Pokemon world.",
+    "- Keep it concrete and flavorful, avoiding generic filler.",
+    "funFact: exactly 2 short sentences, informative and specific.",
   ].join("\n");
 }
 
-export async function generatePokemonDescription(context: AiPokemonContext): Promise<{
-  funFact: string;
-  provider: string;
-  model: string;
-}> {
+function resolveProvider(): "none" | "ollama" | "groq" | "auto" {
   const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
-
-  if (provider === "none") {
-    return buildDeterministicFallback(context);
+  if (provider === "none" || provider === "ollama" || provider === "groq" || provider === "auto") {
+    return provider;
   }
+  return "auto";
+}
 
+async function generateWithOllama(
+  context: AiPokemonContext,
+  timeoutMs: number,
+  prompt: string,
+): Promise<{ funFact: string; provider: string; model: string }> {
   const ollamaUrl = process.env.OLLAMA_URL ?? "http://localhost:11434";
   const model = process.env.OLLAMA_MODEL ?? "qwen2:0.5b";
   const configuredMaxTokens = Number(process.env.AI_MAX_TOKENS ?? 80);
@@ -115,10 +127,6 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
   const numCtx = Number.isFinite(configuredNumCtx)
     ? Math.max(256, Math.min(2048, configuredNumCtx))
     : 1024;
-  const configuredTimeoutMs = Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 60000);
-  const timeoutMs = Number.isFinite(configuredTimeoutMs)
-    ? Math.max(5000, configuredTimeoutMs)
-    : 60000;
 
   const seed =
     typeof context.variationSeed === "number" && Number.isFinite(context.variationSeed)
@@ -145,7 +153,7 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
           num_ctx: numCtx,
           ...(seed ? { seed } : {}),
         },
-        prompt: buildPrompt(context),
+        prompt,
       }),
     });
 
@@ -168,6 +176,103 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
       provider: "ollama",
       model,
     };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function generateWithGroq(
+  context: AiPokemonContext,
+  timeoutMs: number,
+  prompt: string,
+): Promise<{ funFact: string; provider: string; model: string }> {
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    throw new AiProviderError("Missing GROQ_API_KEY");
+  }
+
+  const url = process.env.GROQ_URL ?? "https://api.groq.com/openai/v1/chat/completions";
+  const model = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
+  const configuredMaxTokens = Number(process.env.AI_MAX_TOKENS ?? 80);
+  const maxTokens = Number.isFinite(configuredMaxTokens)
+    ? Math.max(24, Math.min(220, configuredMaxTokens))
+    : 80;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${groqApiKey}`,
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        temperature: 0.2,
+        max_tokens: maxTokens,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: "You are a concise Pokemon world-lore writer. Return strictly JSON.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new AiProviderError(`Groq request failed: ${response.status}`, response.status);
+    }
+
+    const payload = GROQ_RESPONSE_SCHEMA.parse(await response.json());
+
+    let raw: unknown;
+    try {
+      raw = JSON.parse(payload.choices[0].message.content);
+    } catch {
+      throw new AiProviderError("Groq returned non-JSON content");
+    }
+
+    const parsed = AI_DESCRIPTION_SCHEMA.parse(raw);
+    return {
+      funFact: normalizeDescription(parsed.funFact),
+      provider: "groq",
+      model,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export async function generatePokemonDescription(context: AiPokemonContext): Promise<{
+  funFact: string;
+  provider: string;
+  model: string;
+}> {
+  const provider = resolveProvider();
+  const prompt = buildPrompt(context);
+
+  if (provider === "none") {
+    return buildDeterministicFallback(context);
+  }
+
+  const configuredTimeoutMs = Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 60000);
+  const timeoutMs = Number.isFinite(configuredTimeoutMs)
+    ? Math.max(5000, configuredTimeoutMs)
+    : 60000;
+
+  try {
+    if (provider === "groq") {
+      return await generateWithGroq(context, timeoutMs, prompt);
+    }
+    return await generateWithOllama(context, timeoutMs, prompt);
   } catch (error) {
     if (provider === "auto") {
       return buildDeterministicFallback(context);
@@ -183,7 +288,5 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
       throw new AiProviderError("AI provider timeout", 408);
     }
     throw new AiProviderError("Unexpected AI provider error");
-  } finally {
-    clearTimeout(timeout);
   }
 }
