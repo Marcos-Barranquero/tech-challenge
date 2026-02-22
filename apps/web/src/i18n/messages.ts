@@ -49,6 +49,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     empty: {
       title: "No results found",
       subtitle: "Try another name or adjust your filters.",
+      hint: "You can clear active filters and search to explore the full Pokedex again.",
+      cta: "Reset filters",
     },
     detail: {
       back: "Back",
@@ -122,6 +124,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     empty: {
       title: "Sin resultados",
       subtitle: "Prueba otro nombre o ajusta los filtros.",
+      hint: "Puedes limpiar la busqueda y los filtros para volver a explorar toda la Pokedex.",
+      cta: "Reiniciar filtros",
     },
     detail: {
       back: "Volver",
@@ -195,6 +199,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     empty: {
       title: "Nessun risultato",
       subtitle: "Prova un altro nome o modifica i filtri.",
+      hint: "Puoi pulire ricerca e filtri per tornare a esplorare l'intero Pokedex.",
+      cta: "Reimposta filtri",
     },
     detail: {
       back: "Indietro",
@@ -268,6 +274,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     empty: {
       title: "Sem resultados",
       subtitle: "Tente outro nome ou ajuste os filtros.",
+      hint: "Voce pode limpar busca e filtros para explorar toda a Pokedex novamente.",
+      cta: "Redefinir filtros",
     },
     detail: {
       back: "Voltar",
@@ -341,6 +349,8 @@ export const messages: Record<SupportedLocale, Record<string, unknown>> = {
     empty: {
       title: "Keine Ergebnisse",
       subtitle: "Versuche einen anderen Namen oder passe die Filter an.",
+      hint: "Du kannst Suche und Filter zurucksetzen, um den gesamten Pokedex wieder zu sehen.",
+      cta: "Filter zurucksetzen",
     },
     detail: {
       back: "Zurück",

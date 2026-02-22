@@ -59,6 +59,8 @@ const EN_MESSAGES: Record<string, Record<string, string>> = {
   empty: {
     title: "No results found",
     subtitle: "Try another name or adjust your filters.",
+    hint: "You can clear active filters and search to explore the full Pokedex again.",
+    cta: "Reset filters",
   },
   detail: {
     back: "Back",
