@@ -20,6 +20,8 @@ describe("ai-provider", () => {
     delete process.env.AI_PROVIDER;
     delete process.env.OLLAMA_URL;
     delete process.env.OLLAMA_MODEL;
+    delete process.env.GROQ_API_KEY;
+    delete process.env.GROQ_MODEL;
   });
 
   afterEach(() => {
@@ -76,5 +78,40 @@ describe("ai-provider", () => {
 
     expect(result.provider).toBe("none");
     expect(result.funFact.toLowerCase()).toContain("pikachu");
+  });
+
+  it("returns parsed groq response when provider is groq and request succeeds", async () => {
+    process.env.AI_PROVIDER = "groq";
+    process.env.GROQ_API_KEY = "test-key";
+    process.env.GROQ_MODEL = "llama-3.1-8b-instant";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  content: JSON.stringify({
+                    funFact: "Pikachu stores electricity in its cheeks. Its electric sacs can power strong sparks.",
+                  }),
+                },
+              },
+            ],
+          }),
+          {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          },
+        ),
+      ),
+    );
+
+    const result = await generatePokemonDescription(context);
+
+    expect(result.provider).toBe("groq");
+    expect(result.model).toBe("llama-3.1-8b-instant");
+    expect(result.funFact).toContain("Pikachu");
   });
 });

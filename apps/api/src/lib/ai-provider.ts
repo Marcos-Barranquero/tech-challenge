@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { SupportedLocale } from "@tech-challenge/shared";
+import type { AiProviderMode, SupportedLocale } from "@tech-challenge/shared";
 
 type AiPokemonContext = {
   id: number;
@@ -10,10 +10,21 @@ type AiPokemonContext = {
   stats: Array<{ name: string; value: number }>;
   evolutions: string[];
   variationSeed?: number;
+  requestedProvider?: AiProviderMode;
 };
 
 const OLLAMA_RESPONSE_SCHEMA = z.object({
   response: z.string(),
+});
+
+const GROQ_RESPONSE_SCHEMA = z.object({
+  choices: z.array(
+    z.object({
+      message: z.object({
+        content: z.string(),
+      }),
+    }),
+  ).min(1),
 });
 
 const AI_DESCRIPTION_SCHEMA = z.object({
@@ -94,17 +105,22 @@ function buildPrompt(context: AiPokemonContext): string {
   ].join("\n");
 }
 
-export async function generatePokemonDescription(context: AiPokemonContext): Promise<{
-  funFact: string;
-  provider: string;
-  model: string;
-}> {
-  const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
-
-  if (provider === "none") {
-    return buildDeterministicFallback(context);
+function resolveProvider(context: AiPokemonContext): "none" | "ollama" | "groq" | "auto" {
+  if (context.requestedProvider) {
+    return context.requestedProvider;
   }
+  const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
+  if (provider === "none" || provider === "ollama" || provider === "groq" || provider === "auto") {
+    return provider;
+  }
+  return "auto";
+}
 
+async function generateWithOllama(
+  context: AiPokemonContext,
+  timeoutMs: number,
+  prompt: string,
+): Promise<{ funFact: string; provider: string; model: string }> {
   const ollamaUrl = process.env.OLLAMA_URL ?? "http://localhost:11434";
   const model = process.env.OLLAMA_MODEL ?? "qwen2:0.5b";
   const configuredMaxTokens = Number(process.env.AI_MAX_TOKENS ?? 80);
@@ -115,10 +131,6 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
   const numCtx = Number.isFinite(configuredNumCtx)
     ? Math.max(256, Math.min(2048, configuredNumCtx))
     : 1024;
-  const configuredTimeoutMs = Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 60000);
-  const timeoutMs = Number.isFinite(configuredTimeoutMs)
-    ? Math.max(5000, configuredTimeoutMs)
-    : 60000;
 
   const seed =
     typeof context.variationSeed === "number" && Number.isFinite(context.variationSeed)
@@ -145,7 +157,7 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
           num_ctx: numCtx,
           ...(seed ? { seed } : {}),
         },
-        prompt: buildPrompt(context),
+        prompt,
       }),
     });
 
@@ -168,6 +180,103 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
       provider: "ollama",
       model,
     };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function generateWithGroq(
+  context: AiPokemonContext,
+  timeoutMs: number,
+  prompt: string,
+): Promise<{ funFact: string; provider: string; model: string }> {
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    throw new AiProviderError("Missing GROQ_API_KEY");
+  }
+
+  const url = process.env.GROQ_URL ?? "https://api.groq.com/openai/v1/chat/completions";
+  const model = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
+  const configuredMaxTokens = Number(process.env.AI_MAX_TOKENS ?? 80);
+  const maxTokens = Number.isFinite(configuredMaxTokens)
+    ? Math.max(24, Math.min(220, configuredMaxTokens))
+    : 80;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${groqApiKey}`,
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        temperature: 0.2,
+        max_tokens: maxTokens,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: "You are a concise Pokemon analyst. Return strictly JSON.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new AiProviderError(`Groq request failed: ${response.status}`, response.status);
+    }
+
+    const payload = GROQ_RESPONSE_SCHEMA.parse(await response.json());
+
+    let raw: unknown;
+    try {
+      raw = JSON.parse(payload.choices[0].message.content);
+    } catch {
+      throw new AiProviderError("Groq returned non-JSON content");
+    }
+
+    const parsed = AI_DESCRIPTION_SCHEMA.parse(raw);
+    return {
+      funFact: normalizeDescription(parsed.funFact),
+      provider: "groq",
+      model,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+export async function generatePokemonDescription(context: AiPokemonContext): Promise<{
+  funFact: string;
+  provider: string;
+  model: string;
+}> {
+  const provider = resolveProvider(context);
+  const prompt = buildPrompt(context);
+
+  if (provider === "none") {
+    return buildDeterministicFallback(context);
+  }
+
+  const configuredTimeoutMs = Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 60000);
+  const timeoutMs = Number.isFinite(configuredTimeoutMs)
+    ? Math.max(5000, configuredTimeoutMs)
+    : 60000;
+
+  try {
+    if (provider === "groq") {
+      return await generateWithGroq(context, timeoutMs, prompt);
+    }
+    return await generateWithOllama(context, timeoutMs, prompt);
   } catch (error) {
     if (provider === "auto") {
       return buildDeterministicFallback(context);
@@ -183,7 +292,5 @@ export async function generatePokemonDescription(context: AiPokemonContext): Pro
       throw new AiProviderError("AI provider timeout", 408);
     }
     throw new AiProviderError("Unexpected AI provider error");
-  } finally {
-    clearTimeout(timeout);
   }
 }

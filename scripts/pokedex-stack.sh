@@ -4,11 +4,34 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PID_DIR="$ROOT_DIR/.run"
 OLLAMA_PID_FILE="$PID_DIR/ollama.pid"
+ENV_FILE="$ROOT_DIR/.env"
 
-AI_MODE="host"
-MODEL="${OLLAMA_MODEL:-qwen2:0.5b}"
+read_env_value() {
+  local key="$1"
+  local value
+
+  if [[ -f "$ENV_FILE" ]]; then
+    value="$(awk -F= -v k="$key" '
+      $0 ~ "^[[:space:]]*"k"=" {
+        sub(/^[[:space:]]*[^=]+=[[:space:]]*/, "", $0)
+        gsub(/^[\"'"'"']|[\"'"'"']$/, "", $0)
+        print $0
+        exit
+      }
+    ' "$ENV_FILE")"
+  fi
+
+  echo "${value:-}"
+}
+
+AI_MODE="ollama"
+MODEL="${OLLAMA_MODEL:-$(read_env_value OLLAMA_MODEL)}"
+MODEL="${MODEL:-qwen2:0.5b}"
 ACTION="${1:-}"
 SERVICE="${2:-}"
+GROQ_MODEL_VALUE="${GROQ_MODEL:-$(read_env_value GROQ_MODEL)}"
+GROQ_MODEL_VALUE="${GROQ_MODEL_VALUE:-llama-3.1-8b-instant}"
+GROQ_API_KEY_VALUE="${GROQ_API_KEY:-$(read_env_value GROQ_API_KEY)}"
 OLLAMA_FLASH_ATTENTION_VALUE="${OLLAMA_FLASH_ATTENTION:-1}"
 OLLAMA_KV_CACHE_TYPE_VALUE="${OLLAMA_KV_CACHE_TYPE:-q8_0}"
 OLLAMA_LLM_LIBRARY_VALUE="${OLLAMA_LLM_LIBRARY:-metal}"
@@ -18,14 +41,15 @@ OLLAMA_NUM_PARALLEL_VALUE="${OLLAMA_NUM_PARALLEL:-2}"
 print_help() {
   cat <<'EOF'
 Usage:
-  ./scripts/pokedex-stack.sh up [--ai host|none] [--model MODEL]
-  ./scripts/pokedex-stack.sh down [--ai host|none]
+  ./scripts/pokedex-stack.sh up [--ai ollama|host|groq|none] [--model MODEL]
+  ./scripts/pokedex-stack.sh down [--ai ollama|host|groq|none]
   ./scripts/pokedex-stack.sh status
   ./scripts/pokedex-stack.sh logs [service]
 
 Examples:
-  ./scripts/pokedex-stack.sh up --ai host --model phi3:mini
-  ./scripts/pokedex-stack.sh down --ai host
+  ./scripts/pokedex-stack.sh up --ai ollama --model phi3:mini
+  ./scripts/pokedex-stack.sh up --ai groq
+  ./scripts/pokedex-stack.sh down --ai ollama
   ./scripts/pokedex-stack.sh logs api
 EOF
 }
@@ -107,12 +131,24 @@ up_stack() {
   cd "$ROOT_DIR"
 
   case "$AI_MODE" in
-    host)
+    host|ollama)
       ensure_ollama_running_host
       echo "Starting stack with Ollama on host (Metal acceleration on Apple Silicon)..."
       OLLAMA_URL="http://host.docker.internal:11434" \
       OLLAMA_MODEL="$MODEL" \
-      AI_PROVIDER=auto \
+      AI_PROVIDER=ollama \
+      docker compose up -d --build
+      ;;
+    groq)
+      if [[ -z "$GROQ_API_KEY_VALUE" ]]; then
+        echo "GROQ_API_KEY is required for --ai groq."
+        echo "Set it in your shell or in .env and retry."
+        exit 1
+      fi
+      echo "Starting stack with Groq API..."
+      AI_PROVIDER=groq \
+      GROQ_MODEL="$GROQ_MODEL_VALUE" \
+      GROQ_API_KEY="$GROQ_API_KEY_VALUE" \
       docker compose up -d --build
       ;;
     none)
@@ -133,7 +169,7 @@ down_stack() {
   ensure_compose
   cd "$ROOT_DIR"
   docker compose down --remove-orphans
-  if [[ "$AI_MODE" == "host" ]]; then
+  if [[ "$AI_MODE" == "host" || "$AI_MODE" == "ollama" ]]; then
     stop_ollama_host_if_managed
   fi
 }

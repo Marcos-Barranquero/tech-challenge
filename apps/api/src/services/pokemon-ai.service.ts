@@ -12,9 +12,11 @@ export async function getPokemonAIDescription(
 ): Promise<PokemonAIDescriptionOutput> {
   const detail = await getPokemonDetail({ id: input.id });
 
-  const provider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
-  const model = process.env.OLLAMA_MODEL ?? "qwen2:0.5b";
-  const cacheKey = `pokemon:${input.id}:ai-description:${input.locale}:${provider}:${model}:v3`;
+  const envProvider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
+  const requestedProvider = input.aiProvider ?? "default";
+  const ollamaModel = process.env.OLLAMA_MODEL ?? "qwen2:0.5b";
+  const groqModel = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
+  const cacheKey = `pokemon:${input.id}:ai-description:${input.locale}:${envProvider}:${requestedProvider}:${ollamaModel}:${groqModel}:v4`;
 
   const createResponse = async () => {
     const generated = await generatePokemonDescription({
@@ -26,6 +28,7 @@ export async function getPokemonAIDescription(
       stats: detail.stats,
       evolutions: detail.evolutions.map((e) => e.name),
       variationSeed: input.regenerationNonce,
+      requestedProvider: input.aiProvider,
     });
 
     return PokemonAIDescriptionOutputSchema.parse({

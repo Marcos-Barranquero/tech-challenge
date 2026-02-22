@@ -41,6 +41,12 @@ export const SupportedLocaleSchema = z.enum([
   "de",
 ]);
 
+export const AiProviderModeSchema = z.enum([
+  "none",
+  "ollama",
+  "groq",
+]);
+
 export const PokemonListItemSchema = z.object({
   id: z.number().int().positive(),
   name: z.string(),
@@ -132,6 +138,7 @@ export const SearchWithEvolutionsOutputSchema = z.object({
 export const PokemonAIDescriptionInputSchema = z.object({
   id: z.number().int().positive(),
   locale: SupportedLocaleSchema.default("en"),
+  aiProvider: AiProviderModeSchema.optional(),
   forceRegenerate: z.boolean().default(false),
   regenerationNonce: z.number().int().positive().optional(),
 });
@@ -148,6 +155,7 @@ export const PokemonAIDescriptionOutputSchema = z.object({
 export type PokemonType = z.infer<typeof PokemonTypeSchema>;
 export type Generation = z.infer<typeof GenerationSchema>;
 export type SupportedLocale = z.infer<typeof SupportedLocaleSchema>;
+export type AiProviderMode = z.infer<typeof AiProviderModeSchema>;
 export type PokemonListItem = z.infer<typeof PokemonListItemSchema>;
 export type ListPokemonInput = z.infer<typeof ListPokemonInputSchema>;
 export type ListPokemonOutput = z.infer<typeof ListPokemonOutputSchema>;
