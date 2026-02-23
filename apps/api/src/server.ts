@@ -11,6 +11,7 @@ import { TRPCError } from "@trpc/server";
 import Fastify from "fastify";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { ZodError } from "zod";
+import { parseTypeList } from "./lib/query-parsers.js";
 import { PokeApiError } from "./lib/pokeapi-client.js";
 import { getOpenApiDocument } from "./openapi/spec.js";
 import { API_PREFIX, API_VERSION } from "./openapi/version.js";
@@ -105,24 +106,6 @@ function parseNumber(value: unknown): number | undefined {
   if (typeof value === "string" && value.length > 0) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : undefined;
-  }
-  return undefined;
-}
-
-function parseTypeList(value: unknown): string[] | undefined {
-  if (Array.isArray(value)) {
-    const fromArray = value
-      .flatMap((entry) => (typeof entry === "string" ? entry.split(",") : []))
-      .map((entry) => entry.trim())
-      .filter(Boolean);
-    return fromArray.length > 0 ? fromArray : undefined;
-  }
-  if (typeof value === "string") {
-    const fromCsv = value
-      .split(",")
-      .map((entry) => entry.trim())
-      .filter(Boolean);
-    return fromCsv.length > 0 ? fromCsv : undefined;
   }
   return undefined;
 }

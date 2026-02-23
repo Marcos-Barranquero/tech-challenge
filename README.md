@@ -8,6 +8,13 @@ The project supports AI-generated fun facts with three runtime modes: disabled, 
 The architecture is deployment-ready with Docker, Compose profiles, and environment-driven runtime configuration.
 
 ## Architecture (High Level)
+The solution is structured as a monorepo with a clear separation between UI, shared contracts, and backend orchestration.
+The Next.js app is responsible for rendering and interaction, while all external data access is delegated to a Fastify-based BFF.
+The BFF exposes typed tRPC procedures (and REST/OpenAPI endpoints), validates payloads with Zod, and normalizes PokeAPI responses.
+Domain services encapsulate list, detail, evolution, and AI enrichment logic to keep transport and business concerns decoupled.
+Caching and startup warm-up reduce repeated upstream calls and improve perceived latency for common queries.
+An AI provider adapter selects between deterministic fallback, local Ollama, or Groq through environment-driven configuration.
+This keeps the frontend simple, strongly typed, and isolated from provider-specific behavior or third-party API volatility.
 
 ```mermaid
 flowchart LR

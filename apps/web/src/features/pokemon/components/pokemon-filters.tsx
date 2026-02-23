@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { usePokemonMeta } from "../hooks/use-pokemon-meta";
 import type { Generation, PokemonType } from "@tech-challenge/shared";
 import { useTranslations } from "next-intl";
@@ -13,6 +13,7 @@ export function PokemonFilters() {
   const t = useTranslations("filters");
   const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
   const typeMenuRef = useRef<HTMLDivElement | null>(null);
+  const typeOptionRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const formatTypeLabel = (type: PokemonType) => {
     const translated = t(`types.${type}`);
@@ -53,6 +54,63 @@ export function PokemonFilters() {
     };
   }, [isTypeMenuOpen]);
 
+  useEffect(() => {
+    if (!isTypeMenuOpen) {
+      return;
+    }
+
+    const firstSelectedIndex = data?.types.findIndex((type) => selectedTypeSet.has(type)) ?? -1;
+    const focusIndex = firstSelectedIndex >= 0 ? firstSelectedIndex : 0;
+    const node = typeOptionRefs.current[focusIndex];
+    node?.focus();
+  }, [data?.types, isTypeMenuOpen, selectedTypeSet]);
+
+  const focusTypeOption = (index: number) => {
+    const options = typeOptionRefs.current.filter(
+      (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+    );
+    if (options.length === 0) {
+      return;
+    }
+
+    const clampedIndex = Math.max(0, Math.min(index, options.length - 1));
+    options[clampedIndex]?.focus();
+  };
+
+  const onTypeMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const options = typeOptionRefs.current.filter(
+      (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
+    );
+    if (options.length === 0) {
+      return;
+    }
+
+    const currentIndex = options.findIndex((node) => node === document.activeElement);
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      focusTypeOption(currentIndex < 0 ? 0 : currentIndex + 1);
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      focusTypeOption(currentIndex < 0 ? 0 : currentIndex - 1);
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      focusTypeOption(0);
+      return;
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      focusTypeOption(options.length - 1);
+    }
+  };
+
   const toggleType = (type: PokemonType) => {
     const next = new Set(selectedTypeSet);
     if (next.has(type)) {
@@ -85,6 +143,7 @@ export function PokemonFilters() {
             id="type-filter-menu"
             role="listbox"
             aria-multiselectable="true"
+            onKeyDown={onTypeMenuKeyDown}
             className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-md border-2 border-[#5a4d8f] bg-[#f6f4ff] p-1.5 shadow-[0_6px_16px_rgba(0,0,0,0.25)]"
           >
             <button
@@ -94,7 +153,7 @@ export function PokemonFilters() {
             >
               {t("clear")}
             </button>
-            {data?.types.map((type) => {
+            {data?.types.map((type, index) => {
               const isChecked = selectedTypeSet.has(type);
               return (
                 <button
@@ -102,6 +161,9 @@ export function PokemonFilters() {
                   type="button"
                   role="option"
                   aria-selected={isChecked}
+                  ref={(node) => {
+                    typeOptionRefs.current[index] = node;
+                  }}
                   onClick={() => toggleType(type)}
                   className={`flex w-full items-center justify-between rounded-md border px-2 py-1.5 text-left transition ${
                     isChecked
