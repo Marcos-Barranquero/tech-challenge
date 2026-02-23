@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { usePokemonMeta } from "../hooks/use-pokemon-meta";
 import type { Generation, PokemonType } from "@tech-challenge/shared";
 import { useTranslations } from "next-intl";
@@ -40,7 +40,7 @@ export function PokemonFilters() {
       setIsTypeMenuOpen(false);
     };
 
-    const onEscape = (event: KeyboardEvent) => {
+    const onEscape = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsTypeMenuOpen(false);
       }
@@ -77,7 +77,7 @@ export function PokemonFilters() {
     options[clampedIndex]?.focus();
   };
 
-  const onTypeMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onTypeMenuKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     const options = typeOptionRefs.current.filter(
       (node): node is HTMLButtonElement => node instanceof HTMLButtonElement,
     );
