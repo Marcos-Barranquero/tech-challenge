@@ -89,7 +89,7 @@ async function getInitialListPage(
   input: Pick<ListPokemonInfiniteInput, "search" | "types" | "type" | "generation" | "limit" | "sort">,
 ): Promise<ListPokemonInfiniteOutput | null> {
   const apiBaseUrl = resolveApiBaseUrl();
-  const url = new URL("/api/v1/pokemon", apiBaseUrl);
+  const url = new URL("/v1/pokemon", apiBaseUrl);
   url.searchParams.set("page", "1");
   url.searchParams.set("pageSize", String(input.limit));
   url.searchParams.set("sort", input.sort);
