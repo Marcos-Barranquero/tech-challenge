@@ -64,6 +64,20 @@ const sampleList: PokemonListItem[] = [
     types: ["fire"],
     image: "https://img/charmander.png",
   },
+  {
+    id: 130,
+    name: "gyarados",
+    generation: "generation-i",
+    types: ["water", "flying"],
+    image: "https://img/gyarados.png",
+  },
+  {
+    id: 7,
+    name: "squirtle",
+    generation: "generation-i",
+    types: ["water"],
+    image: "https://img/squirtle.png",
+  },
 ];
 
 describe("pokemon.service", () => {
@@ -97,9 +111,39 @@ describe("pokemon.service", () => {
       generation: undefined,
     });
 
-    expect(result.items.map((p) => p.id)).toEqual([26, 172]);
-    expect(result.total).toBe(4);
-    expect(result.hasNextPage).toBe(false);
+    expect(result.items.map((p) => p.id)).toEqual([25, 26]);
+    expect(result.total).toBe(6);
+    expect(result.hasNextPage).toBe(true);
+  });
+
+  it("filters by intersection when multiple types are provided", async () => {
+    const result = await listPokemon({
+      search: "",
+      types: ["water", "flying"],
+      page: 1,
+      pageSize: 20,
+      sort: "id-asc",
+      generation: undefined,
+      type: undefined,
+    });
+
+    expect(result.items.map((p) => p.name)).toEqual(["gyarados"]);
+    expect(result.total).toBe(1);
+  });
+
+  it("falls back to legacy single type when types[] is not provided", async () => {
+    const result = await listPokemon({
+      search: "",
+      type: "water",
+      page: 1,
+      pageSize: 20,
+      sort: "id-asc",
+      generation: undefined,
+      types: undefined,
+    });
+
+    expect(result.items.map((p) => p.name)).toEqual(["squirtle", "gyarados"]);
+    expect(result.total).toBe(2);
   });
 
   it("builds pokemon detail including chain evolutions", async () => {

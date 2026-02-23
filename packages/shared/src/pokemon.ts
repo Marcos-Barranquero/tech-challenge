@@ -51,6 +51,7 @@ export const PokemonListItemSchema = z.object({
 
 export const ListPokemonInputSchema = z.object({
   search: z.string().trim().default(""),
+  types: z.array(PokemonTypeSchema).min(1).max(18).optional(),
   type: PokemonTypeSchema.optional(),
   generation: GenerationSchema.optional(),
   page: z.number().int().min(1).default(1),
@@ -68,6 +69,7 @@ export const ListPokemonOutputSchema = z.object({
 
 export const ListPokemonInfiniteInputSchema = z.object({
   search: z.string().trim().default(""),
+  types: z.array(PokemonTypeSchema).min(1).max(18).optional(),
   type: PokemonTypeSchema.optional(),
   generation: GenerationSchema.optional(),
   cursor: z.number().int().min(1).optional(),
@@ -139,7 +141,7 @@ export const PokemonAIDescriptionInputSchema = z.object({
 export const PokemonAIDescriptionOutputSchema = z.object({
   id: z.number().int().positive(),
   name: z.string(),
-  funFact: z.string().min(1).max(300),
+  funFact: z.string().min(1).max(200),
   provider: z.string(),
   model: z.string(),
   generatedAt: z.string(),

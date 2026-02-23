@@ -27,7 +27,7 @@ const GROQ_RESPONSE_SCHEMA = z.object({
 });
 
 const AI_DESCRIPTION_SCHEMA = z.object({
-  funFact: z.string().min(1).max(300),
+  funFact: z.string().min(1).max(200),
 });
 
 export class AiProviderError extends Error {
@@ -101,6 +101,7 @@ function buildPrompt(context: AiPokemonContext): string {
     "- Physical traits or anatomy, behavior/personality, habitat/ecosystem, daily habits, or role in the Pokemon world.",
     "- Keep it concrete and flavorful, avoiding generic filler.",
     "funFact: exactly 2 short sentences, informative and specific.",
+    "Hard limit: maximum 200 characters including spaces and punctuation.",
   ].join("\n");
 }
 

@@ -7,19 +7,20 @@ import type { PokemonListItem } from "@tech-challenge/shared";
 import { usePokemonQueryState } from "./use-pokemon-query-state";
 
 export function usePokemonList() {
-  const { search, selectedType, selectedGeneration } = usePokemonQueryState();
+  const { search, selectedType, selectedTypes, selectedGeneration } = usePokemonQueryState();
   const pageSize = 60;
   const term = useMemo(() => search.trim(), [search]);
 
   const infiniteInput = useMemo(
     () => ({
       search: term,
+      types: selectedTypes.length > 0 ? selectedTypes : undefined,
       type: selectedType,
       generation: selectedGeneration,
       limit: pageSize,
       sort: "id-asc" as const
     }),
-    [pageSize, selectedGeneration, selectedType, term]
+    [pageSize, selectedGeneration, selectedType, selectedTypes, term]
   );
 
   const listQuery = trpc.pokemon.listInfinite.useInfiniteQuery(infiniteInput, {
@@ -66,7 +67,12 @@ export function usePokemonList() {
       }
       seen.add(p.id);
 
-      if (infiniteInput.type && !p.types.includes(infiniteInput.type)) {
+      if (infiniteInput.types && infiniteInput.types.length > 0) {
+        const hasAllTypes = infiniteInput.types.every((type) => p.types.includes(type));
+        if (!hasAllTypes) {
+          return false;
+        }
+      } else if (infiniteInput.type && !p.types.includes(infiniteInput.type)) {
         return false;
       }
       if (infiniteInput.generation && p.generation !== infiniteInput.generation) {
@@ -78,6 +84,7 @@ export function usePokemonList() {
     infiniteInput.generation,
     infiniteInput.search.length,
     infiniteInput.type,
+    infiniteInput.types,
     listQuery.data?.pages,
     searchQuery.data?.groups,
   ]);

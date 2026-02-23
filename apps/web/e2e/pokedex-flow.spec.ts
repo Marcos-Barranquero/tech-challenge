@@ -49,9 +49,10 @@ test.describe("Pokedex flow", () => {
   test("applies type and generation filters", async ({ page }) => {
     await waitForCollectionReady(page);
 
-    await page.getByRole("combobox", { name: /type/i }).selectOption("water");
+    await page.getByRole("button", { name: /type/i }).click();
+    await page.getByRole("option", { name: /water/i }).click();
     await page.getByRole("combobox", { name: /generation/i }).selectOption("generation-i");
-    await expect(page).toHaveURL(/type=water/);
+    await expect(page).toHaveURL(/types=water/);
     await expect(page).toHaveURL(/generation=generation-i/);
 
     const cards = page.locator(".screen-grid article");

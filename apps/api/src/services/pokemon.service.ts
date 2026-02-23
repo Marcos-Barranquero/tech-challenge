@@ -10,6 +10,7 @@ import {
   type PokemonDetailOutput,
   type SearchWithEvolutionsInput,
   type SearchWithEvolutionsOutput,
+  type PokemonType,
 } from "@tech-challenge/shared";
 import { TRPCError } from "@trpc/server";
 import { getOrSetCache } from "../lib/cache.js";
@@ -28,14 +29,25 @@ function normalizeTerm(input: string): string {
   return input.trim().toLowerCase();
 }
 
+function resolveRequestedTypes(input: { types?: PokemonType[]; type?: PokemonType }): PokemonType[] | undefined {
+  if (input.types && input.types.length > 0) {
+    return input.types;
+  }
+  if (input.type) {
+    return [input.type];
+  }
+  return undefined;
+}
+
 export async function listPokemon(input: ListPokemonInput): Promise<ListPokemonOutput> {
   const index = await getPokemonIndex();
   const term = normalizeTerm(input.search);
+  const requestedTypes = resolveRequestedTypes(input);
 
   let filtered = index.list;
 
-  if (input.type) {
-    filtered = filtered.filter((p) => p.types.includes(input.type!));
+  if (requestedTypes && requestedTypes.length > 0) {
+    filtered = filtered.filter((p) => requestedTypes.every((type) => p.types.includes(type)));
   }
 
   if (input.generation) {
@@ -68,6 +80,7 @@ export async function listPokemonInfinite(
   const pageSize = input.limit;
   const base = await listPokemon({
     search: input.search,
+    types: input.types,
     type: input.type,
     generation: input.generation,
     page,

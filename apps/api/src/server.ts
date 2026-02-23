@@ -11,6 +11,7 @@ import { TRPCError } from "@trpc/server";
 import Fastify from "fastify";
 import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import { ZodError } from "zod";
+import { parseTypeList } from "./lib/query-parsers.js";
 import { PokeApiError } from "./lib/pokeapi-client.js";
 import { getOpenApiDocument } from "./openapi/spec.js";
 import { API_PREFIX, API_VERSION } from "./openapi/version.js";
@@ -197,6 +198,7 @@ async function bootstrap() {
       const query = request.query as Record<string, unknown>;
       const input = ListPokemonInputSchema.parse({
         search: typeof query.search === "string" ? query.search : "",
+        types: parseTypeList(query.types),
         type: typeof query.type === "string" ? query.type : undefined,
         generation: typeof query.generation === "string" ? query.generation : undefined,
         page: parseNumber(query.page) ?? 1,
