@@ -41,7 +41,7 @@
     "happy-dom": "^20.6.3",
     "jsdom": "^28.1.0",
     "postcss": "^8.5.3",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.2.0",
     "typescript": "^5.7.3"
   }
 }
