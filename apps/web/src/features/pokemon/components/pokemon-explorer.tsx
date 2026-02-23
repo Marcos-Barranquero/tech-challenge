@@ -14,11 +14,24 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { GbaThemePicker } from "./gba-theme-picker";
 import { useGbaThemeStore } from "@/stores/gba-theme.store";
 import { useTranslations } from "next-intl";
+import type { ListPokemonInfiniteInput, ListPokemonInfiniteOutput } from "@tech-challenge/shared";
 
-export function PokemonExplorer() {
+export function PokemonExplorer({
+  initialListPage,
+  initialListInput,
+}: {
+  initialListPage?: ListPokemonInfiniteOutput | null;
+  initialListInput?: Pick<
+    ListPokemonInfiniteInput,
+    "search" | "types" | "type" | "generation" | "limit" | "sort"
+  > | null;
+}) {
   const theme = useGbaThemeStore((state) => state.theme);
   const tCommon = useTranslations("common");
-  const { items, isLoading, isInitialLoading, hasNextPage, isFetchingNextPage, loadMore } = usePokemonList();
+  const { items, isLoading, isInitialLoading, hasNextPage, isFetchingNextPage, loadMore } = usePokemonList({
+    initialListPage,
+    initialListInput,
+  });
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

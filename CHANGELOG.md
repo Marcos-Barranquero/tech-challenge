@@ -5,6 +5,22 @@ All notable changes to this project are documented in this file.
 This format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/).
 
+## [0.0.11] - 2026-02-23
+
+### Changed
+
+- Implemented SSR for the first catalog page in `apps/web/src/app/page.tsx`:
+  - server-side fetch of the initial list page,
+  - schema-validated payload adaptation to infinite-list shape for client hydration.
+- Improved SSR/client consistency by making initial hydration URL-aware:
+  - server now derives initial list input from query params (`type`, `types`, `generation`),
+  - client only consumes SSR `initialData` when runtime query state matches server input, preventing hydration mismatches.
+- Updated `PokemonExplorer` and `usePokemonList` contracts to accept SSR bootstrap input/page as optional props.
+
+### Fixed
+
+- Docker web build failure (`Module not found: Can't resolve '@tech-challenge/shared'`) by compiling `@tech-challenge/shared` before `@tech-challenge/web` in `Dockerfile.web`.
+
 ## [0.0.10] - 2026-02-23
 
 ### Added

@@ -3,10 +3,18 @@
 import { trpc } from "@/lib/trpc";
 import toast from "react-hot-toast";
 import { useCallback, useEffect, useMemo } from "react";
-import type { PokemonListItem } from "@tech-challenge/shared";
+import type { ListPokemonInfiniteInput, ListPokemonInfiniteOutput, PokemonListItem } from "@tech-challenge/shared";
 import { usePokemonQueryState } from "./use-pokemon-query-state";
 
-export function usePokemonList() {
+type UsePokemonListOptions = {
+  initialListPage?: ListPokemonInfiniteOutput | null;
+  initialListInput?: Pick<
+    ListPokemonInfiniteInput,
+    "search" | "types" | "type" | "generation" | "limit" | "sort"
+  > | null;
+};
+
+export function usePokemonList(options?: UsePokemonListOptions) {
   const { search, selectedType, selectedTypes, selectedGeneration } = usePokemonQueryState();
   const pageSize = 60;
   const term = useMemo(() => search.trim(), [search]);
@@ -23,10 +31,29 @@ export function usePokemonList() {
     [pageSize, selectedGeneration, selectedType, selectedTypes, term]
   );
 
+  const initialListInput = options?.initialListInput;
+
+  const useInitialListPage =
+    Boolean(options?.initialListPage) &&
+    Boolean(initialListInput) &&
+    infiniteInput.search.length === 0 &&
+    (initialListInput?.search ?? "") === infiniteInput.search &&
+    (initialListInput?.generation ?? undefined) === infiniteInput.generation &&
+    (initialListInput?.type ?? undefined) === infiniteInput.type &&
+    (initialListInput?.sort ?? "id-asc") === infiniteInput.sort &&
+    (initialListInput?.limit ?? pageSize) === infiniteInput.limit &&
+    JSON.stringify(initialListInput?.types ?? []) === JSON.stringify(infiniteInput.types ?? []);
+
   const listQuery = trpc.pokemon.listInfinite.useInfiniteQuery(infiniteInput, {
     enabled: infiniteInput.search.length === 0,
     initialCursor: 1,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    initialData: useInitialListPage && options?.initialListPage
+      ? {
+          pages: [options.initialListPage],
+          pageParams: [1],
+        }
+      : undefined,
   });
 
   const searchQuery = trpc.pokemon.searchWithEvolutions.useQuery(
