@@ -36,7 +36,6 @@ function firstParam(value: string | string[] | undefined): string | undefined {
 
 function parseSelectedTypes(searchParams: HomePageSearchParams): PokemonType[] {
   const rawTypes = firstParam(searchParams.types);
-  const rawLegacyType = firstParam(searchParams.type);
 
   const fromCsv =
     rawTypes
@@ -44,10 +43,9 @@ function parseSelectedTypes(searchParams: HomePageSearchParams): PokemonType[] {
       .map((entry) => entry.trim())
       .filter(Boolean) ?? [];
 
-  const candidates = rawLegacyType ? [rawLegacyType, ...fromCsv] : fromCsv;
   const unique = new Set<PokemonType>();
 
-  for (const candidate of candidates) {
+  for (const candidate of fromCsv) {
     const parsed = PokemonTypeSchema.safeParse(candidate);
     if (parsed.success) {
       unique.add(parsed.data);
@@ -68,6 +66,10 @@ function buildInitialListInput(searchParams: HomePageSearchParams): Pick<
   }
 
   const selectedTypes = parseSelectedTypes(searchParams);
+  const rawLegacyType = firstParam(searchParams.type);
+  const legacyTypeParsed = rawLegacyType
+    ? PokemonTypeSchema.safeParse(rawLegacyType)
+    : { success: false as const };
   const maybeGeneration = firstParam(searchParams.generation);
   const generationParsed = maybeGeneration
     ? GenerationSchema.safeParse(maybeGeneration)
@@ -76,7 +78,7 @@ function buildInitialListInput(searchParams: HomePageSearchParams): Pick<
   return {
     search: "",
     types: selectedTypes.length > 0 ? selectedTypes : undefined,
-    type: selectedTypes[0],
+    type: selectedTypes[0] ?? (legacyTypeParsed.success ? legacyTypeParsed.data : undefined),
     generation: generationParsed.success ? generationParsed.data : undefined,
     limit: 60,
     sort: "id-asc",

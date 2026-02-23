@@ -32,6 +32,22 @@ export function usePokemonList(options?: UsePokemonListOptions) {
   );
 
   const initialListInput = options?.initialListInput;
+  const hasSameTypesAsInitial = useMemo(() => {
+    const initialTypes = initialListInput?.types ?? [];
+    const currentTypes = infiniteInput.types ?? [];
+
+    if (initialTypes.length !== currentTypes.length) {
+      return false;
+    }
+
+    for (let index = 0; index < initialTypes.length; index += 1) {
+      if (initialTypes[index] !== currentTypes[index]) {
+        return false;
+      }
+    }
+
+    return true;
+  }, [infiniteInput.types, initialListInput?.types]);
 
   const useInitialListPage =
     Boolean(options?.initialListPage) &&
@@ -42,7 +58,7 @@ export function usePokemonList(options?: UsePokemonListOptions) {
     (initialListInput?.type ?? undefined) === infiniteInput.type &&
     (initialListInput?.sort ?? "id-asc") === infiniteInput.sort &&
     (initialListInput?.limit ?? pageSize) === infiniteInput.limit &&
-    JSON.stringify(initialListInput?.types ?? []) === JSON.stringify(infiniteInput.types ?? []);
+    hasSameTypesAsInitial;
 
   const listQuery = trpc.pokemon.listInfinite.useInfiniteQuery(infiniteInput, {
     enabled: infiniteInput.search.length === 0,
