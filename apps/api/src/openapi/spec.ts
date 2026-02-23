@@ -50,10 +50,21 @@ const PokemonPathParamsSchema = z.object({
   id: z.number().int().positive(),
 });
 
+const ListPokemonRestQuerySchema = ListPokemonInputSchema.extend({
+  // Runtime accepts both repeated query values and CSV input for `types`.
+  types: z
+    .union([
+      z.array(PokemonTypeSchema).min(1).max(18),
+      z.string().trim().min(1),
+    ])
+    .optional(),
+});
+
 function createRegistry() {
   const registry = new OpenAPIRegistry();
 
   registry.register("ListPokemonInput", ListPokemonInputSchema);
+  registry.register("ListPokemonRestQuery", ListPokemonRestQuerySchema);
   registry.register("ListPokemonOutput", ListPokemonOutputSchema);
   registry.register("PokemonDetailOutput", PokemonDetailOutputSchema);
   registry.register("SearchWithEvolutionsInput", SearchWithEvolutionsInputSchema);
@@ -69,9 +80,9 @@ function createRegistry() {
     path: `${API_PREFIX}/pokemon`,
     summary: "List Pokemon",
     description:
-      "Returns Pokemon list sorted by ID with optional search, type, and generation filters.",
+      "Returns Pokemon list sorted by ID with optional search, type(s), and generation filters. `types` accepts CSV (`water,fire`) or repeated query params.",
     request: {
-      query: ListPokemonInputSchema,
+      query: ListPokemonRestQuerySchema,
     },
     responses: {
       200: {
