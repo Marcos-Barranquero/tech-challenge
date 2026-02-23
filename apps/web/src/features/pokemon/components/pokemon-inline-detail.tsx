@@ -117,9 +117,9 @@ export function PokemonInlineDetail({
           </div>
         </div>
 
-        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-2 lg:flex lg:flex-col">
-          <div className="flex min-h-0 flex-col gap-2 sm:gap-3 lg:flex-1">
-            <section className="flex min-h-[130px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[145px] sm:p-2.5 lg:min-h-0">
+        <div className="min-h-0 rounded-md border-2 border-[#7b6fb0] bg-[#f6f4ff] p-2 sm:p-3 md:col-span-2 lg:col-span-2 lg:grid lg:grid-rows-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-3">
+          <div className="flex min-h-0 flex-col gap-2 sm:gap-3 lg:contents">
+            <section className="flex min-h-[130px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[145px] sm:p-2.5 lg:h-full lg:min-h-0">
               <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
                 {t("funFact")}
               </h3>
@@ -146,7 +146,7 @@ export function PokemonInlineDetail({
               </div>
             </section>
 
-            <section className="flex min-h-[145px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[165px] sm:p-2.5 lg:min-h-0">
+            <section className="flex min-h-[145px] flex-col rounded-md border border-[#8a7fc1] bg-[#f1eeff] p-2 sm:min-h-[165px] sm:p-2.5 lg:h-full lg:min-h-0">
               <h3 className="gba-ui-font text-[13px] uppercase text-[#1f2033] sm:text-[15px] md:text-[17px] lg:text-[18px]">
                 {t("stats")}
               </h3>
