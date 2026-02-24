@@ -12,7 +12,12 @@
     "test:e2e": "playwright test -c apps/web/playwright.config.ts --grep-invert \"@a11y|@perf\"",
     "test:e2e:headed": "playwright test -c apps/web/playwright.config.ts --headed",
     "test:perf:smoke": "playwright test -c apps/web/playwright.config.ts --grep @perf",
-    "test:a11y": "playwright test -c apps/web/playwright.config.ts --grep @a11y"
+    "test:a11y": "playwright test -c apps/web/playwright.config.ts --grep @a11y",
+    "slides:dev": "pnpm --filter @tech-challenge/presentation dev",
+    "slides:build": "pnpm --filter @tech-challenge/presentation build",
+    "slides:html": "pnpm --filter @tech-challenge/presentation build:html",
+    "slides:pdf": "pnpm --filter @tech-challenge/presentation build:pdf",
+    "slides:pptx": "pnpm --filter @tech-challenge/presentation build:pptx"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",

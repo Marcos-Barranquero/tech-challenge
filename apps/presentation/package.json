@@ -1,0 +1,15 @@
+{
+  "name": "@tech-challenge/presentation",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "marp --server --watch --html --theme-set ./theme.css -I .",
+    "build:html": "marp slides.md --html --theme-set ./theme.css -o dist/index.html",
+    "build:pdf": "marp slides.md --pdf --html --allow-local-files --theme-set ./theme.css -o dist/tech-challenge-defense.pdf",
+    "build:pptx": "marp slides.md --pptx --html --allow-local-files --theme-set ./theme.css -o dist/tech-challenge-defense.pptx",
+    "build": "pnpm run build:html && pnpm run build:pdf && pnpm run build:pptx"
+  },
+  "devDependencies": {
+    "@marp-team/marp-cli": "^4.2.3"
+  }
+}

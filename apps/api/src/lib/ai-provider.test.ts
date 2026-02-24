@@ -64,6 +64,33 @@ describe("ai-provider", () => {
     expect(result.funFact).toContain("Pikachu");
   });
 
+  it("truncates long ollama fun facts to avoid provider failures", async () => {
+    process.env.AI_PROVIDER = "ollama";
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            response: JSON.stringify({
+              funFact:
+                "Pikachu stores electricity in its cheeks and often recharges while resting near sunny clearings, where static builds up across its fur and helps it release stronger sparks when it feels threatened by sudden movements in the wild.",
+            }),
+          }),
+          {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          },
+        ),
+      ),
+    );
+
+    const result = await generatePokemonDescription(context);
+
+    expect(result.provider).toBe("ollama");
+    expect(result.funFact.length).toBeLessThanOrEqual(200);
+  });
+
   it("falls back when provider is auto and request fails", async () => {
     process.env.AI_PROVIDER = "auto";
 

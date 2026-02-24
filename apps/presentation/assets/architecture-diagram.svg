@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6fbff" />
+      <stop offset="100%" stop-color="#e6f0ff" />
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0,0 12,4 0,8" fill="#2357c8"/>
+    </marker>
+    <style>
+      .title { font: 700 42px Roboto, Arial, sans-serif; fill: #16357f; }
+      .subtitle { font: 500 24px Roboto, Arial, sans-serif; fill: #3858a8; }
+      .box { fill: #ffffff; stroke: #5b7ed6; stroke-width: 3; rx: 18; }
+      .box2 { fill: #f7f9ff; stroke: #6b8ae0; stroke-width: 3; rx: 16; }
+      .txtH { font: 700 28px Roboto, Arial, sans-serif; fill: #1e3f93; }
+      .txt { font: 500 20px Roboto, Arial, sans-serif; fill: #22355f; }
+      .tiny { font: 500 18px Roboto, Arial, sans-serif; fill: #3f568d; }
+      .arrow { stroke: #2357c8; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .note { fill: #e9f1ff; stroke: #88a4e8; stroke-width: 2; rx: 12; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#bg)"/>
+  <text x="70" y="72" class="title">Arquitectura del monorepo (BFF-first)</text>
+  <text x="70" y="108" class="subtitle">Pokedex · Next.js + tRPC + Fastify + Shared Contracts</text>
+
+  <!-- Browser -->
+  <rect x="80" y="220" width="360" height="190" class="box"/>
+  <text x="115" y="275" class="txtH">Cliente (Browser)</text>
+  <text x="115" y="318" class="txt">UI GBA + i18n + URL state</text>
+  <text x="115" y="350" class="tiny">No acceso directo a PokéAPI</text>
+
+  <!-- Web app -->
+  <rect x="520" y="190" width="420" height="250" class="box"/>
+  <text x="555" y="245" class="txtH">apps/web (Next.js)</text>
+  <text x="555" y="287" class="txt">App Router + SSR inicial</text>
+  <text x="555" y="319" class="txt">tRPC client + React Query</text>
+  <text x="555" y="351" class="txt">UI responsive (desktop/tablet/mobile)</text>
+
+  <!-- API -->
+  <rect x="1040" y="160" width="470" height="310" class="box"/>
+  <text x="1075" y="215" class="txtH">apps/api (Fastify + tRPC)</text>
+  <text x="1075" y="257" class="txt">Procedures tipadas y saneadas</text>
+  <text x="1075" y="289" class="txt">Retry + timeout + error mapping</text>
+  <text x="1075" y="321" class="txt">OpenAPI REST mirror</text>
+  <text x="1075" y="353" class="txt">Caché + dedupe + warmup controlado</text>
+
+  <!-- Shared -->
+  <rect x="520" y="530" width="420" height="170" class="box2"/>
+  <text x="555" y="585" class="txtH">packages/shared</text>
+  <text x="555" y="627" class="txt">Zod schemas + tipos comunes</text>
+  <text x="555" y="659" class="tiny">Single source of truth FE/BE</text>
+
+  <!-- External -->
+  <rect x="1040" y="560" width="470" height="260" class="box2"/>
+  <text x="1075" y="615" class="txtH">Servicios externos</text>
+  <text x="1075" y="657" class="txt">PokéAPI (datos de dominio)</text>
+  <text x="1075" y="689" class="txt">IA opcional: none / Ollama / Groq</text>
+  <text x="1075" y="721" class="tiny">Fallback determinista si falla IA</text>
+
+  <!-- Arrows -->
+  <path d="M 440 315 L 520 315" class="arrow"/>
+  <path d="M 940 315 L 1040 315" class="arrow"/>
+  <path d="M 730 440 L 730 530" class="arrow"/>
+  <path d="M 940 615 L 1040 615" class="arrow"/>
+  <path d="M 1275 470 L 1275 560" class="arrow"/>
+
+  <!-- Notes -->
+  <rect x="80" y="540" width="360" height="160" class="note"/>
+  <text x="110" y="590" class="txtH" style="font-size:24px">Despliegue</text>
+  <text x="110" y="625" class="txt">Docker Compose (local)</text>
+  <text x="110" y="655" class="txt">Railway (cloud)</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#e8f2ff"/>
+    </linearGradient>
+    <marker id="arr" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0,0 12,4 0,8" fill="#1f4fb7"/>
+    </marker>
+    <style>
+      .title { font: 700 40px Roboto, Arial, sans-serif; fill: #183b87; }
+      .lane { fill: #ffffff; stroke: #7f9be0; stroke-width: 2; rx: 12; }
+      .step { fill: #f4f8ff; stroke: #5e7ed2; stroke-width: 2.5; rx: 12; }
+      .stepAlt { fill: #ffffff; stroke: #5e7ed2; stroke-width: 2.5; rx: 12; }
+      .h { font: 700 22px Roboto, Arial, sans-serif; fill: #1f3f92; }
+      .t { font: 500 18px Roboto, Arial, sans-serif; fill: #27395f; }
+      .a { stroke: #1f4fb7; stroke-width: 3.5; fill: none; marker-end: url(#arr); }
+      .ret { stroke: #5272c8; stroke-width: 3; stroke-dasharray: 8 6; fill: none; marker-end: url(#arr); }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#bg2)"/>
+  <text x="70" y="70" class="title">Flujo de llamadas: catálogo y detalle</text>
+
+  <!-- lanes -->
+  <rect x="70" y="120" width="220" height="700" class="lane"/>
+  <rect x="320" y="120" width="260" height="700" class="lane"/>
+  <rect x="610" y="120" width="280" height="700" class="lane"/>
+  <rect x="920" y="120" width="280" height="700" class="lane"/>
+  <rect x="1230" y="120" width="300" height="700" class="lane"/>
+
+  <text x="120" y="160" class="h">Usuario</text>
+  <text x="385" y="160" class="h">apps/web</text>
+  <text x="675" y="160" class="h">apps/api</text>
+  <text x="990" y="160" class="h">Caché</text>
+  <text x="1300" y="160" class="h">PokéAPI / IA</text>
+
+  <!-- steps -->
+  <rect x="340" y="210" width="220" height="70" class="step"/>
+  <text x="360" y="240" class="t">1) Carga inicial</text>
+  <text x="360" y="264" class="t">SSR catálogo</text>
+
+  <rect x="630" y="320" width="240" height="90" class="stepAlt"/>
+  <text x="650" y="352" class="t">2) tRPC listInfinite</text>
+  <text x="650" y="376" class="t">validación Zod</text>
+
+  <rect x="940" y="450" width="240" height="110" class="step"/>
+  <text x="960" y="484" class="t">3) Cache lookup</text>
+  <text x="960" y="508" class="t">dedupe in-flight</text>
+  <text x="960" y="532" class="t">warm entries</text>
+
+  <rect x="1250" y="610" width="260" height="110" class="stepAlt"/>
+  <text x="1270" y="644" class="t">4) Fetch upstream</text>
+  <text x="1270" y="668" class="t">PokéAPI / provider IA</text>
+  <text x="1270" y="692" class="t">retry + timeout</text>
+
+  <rect x="630" y="760" width="240" height="50" class="step"/>
+  <text x="650" y="792" class="t">5) Respuesta saneada</text>
+
+  <!-- arrows -->
+  <path d="M 560 245 L 630 245 L 630 320" class="a"/>
+  <path d="M 870 365 L 940 365 L 940 450" class="a"/>
+  <path d="M 1180 505 L 1250 505 L 1250 610" class="a"/>
+
+  <path d="M 1250 720 L 1180 720 L 1180 760 L 870 760" class="ret"/>
+  <path d="M 630 785 L 560 785 L 560 560" class="ret"/>
+  <path d="M 560 560 L 290 560" class="ret"/>
+
+  <!-- user triggers -->
+  <rect x="90" y="220" width="180" height="70" class="step"/>
+  <text x="105" y="250" class="t">Abrir app</text>
+  <text x="105" y="274" class="t">/ con filtros URL</text>
+
+  <rect x="90" y="470" width="180" height="95" class="stepAlt"/>
+  <text x="105" y="502" class="t">Clic en Pokémon</text>
+  <text x="105" y="526" class="t">Detalle inline</text>
+  <text x="105" y="550" class="t">+ fun fact IA</text>
+
+  <path d="M 270 255 L 340 255" class="a"/>
+  <path d="M 270 520 L 340 520" class="a"/>
+</svg>

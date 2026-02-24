@@ -27,7 +27,7 @@ const GROQ_RESPONSE_SCHEMA = z.object({
 });
 
 const AI_DESCRIPTION_SCHEMA = z.object({
-  funFact: z.string().min(1).max(200),
+  funFact: z.string().min(1),
 });
 
 export class AiProviderError extends Error {
@@ -42,6 +42,25 @@ export class AiProviderError extends Error {
 
 function normalizeDescription(value: string): string {
   return value.replace(/\s+/g, " ").trim();
+}
+
+function clampFunFact(value: string, maxLength = 200): string {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  const limited = value.slice(0, maxLength);
+  const lastSentenceBreak = Math.max(
+    limited.lastIndexOf("."),
+    limited.lastIndexOf("!"),
+    limited.lastIndexOf("?"),
+  );
+
+  if (lastSentenceBreak >= Math.floor(maxLength * 0.6)) {
+    return limited.slice(0, lastSentenceBreak + 1).trim();
+  }
+
+  return `${limited.slice(0, Math.max(0, maxLength - 1)).trim()}…`;
 }
 
 function toDisplayName(name: string): string {
@@ -71,7 +90,7 @@ function buildDeterministicFallback(context: AiPokemonContext): {
   };
 
   return {
-    funFact: normalizeDescription(fallbackByLocale[context.locale]),
+    funFact: clampFunFact(normalizeDescription(fallbackByLocale[context.locale])),
     provider: "none",
     model: "none",
   };
@@ -173,7 +192,7 @@ async function generateWithOllama(
 
     const parsed = AI_DESCRIPTION_SCHEMA.parse(raw);
     return {
-      funFact: normalizeDescription(parsed.funFact),
+      funFact: clampFunFact(normalizeDescription(parsed.funFact)),
       provider: "ollama",
       model,
     };
@@ -243,7 +262,7 @@ async function generateWithGroq(
 
     const parsed = AI_DESCRIPTION_SCHEMA.parse(raw);
     return {
-      funFact: normalizeDescription(parsed.funFact),
+      funFact: clampFunFact(normalizeDescription(parsed.funFact)),
       provider: "groq",
       model,
     };
